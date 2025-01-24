@@ -29,28 +29,28 @@
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2563739074608905" crossorigin="anonymous"></script>
 </head>
 
-<body class="font-host bg-egg-yellow text-gray-800 min-h-screen flex flex-col">
+<body class="flex flex-col min-h-screen text-gray-800 font-host bg-egg-yellow">
     <!-- Header -->
-    <header class="bg-dark-brown px-8 pb-4 pt-3 shadow-lg flex flex-row items-center justify-start">
-        <div class="flex items-center justify-between border-r border-egg-white pr-8">
+    <header class="flex flex-row items-center justify-start px-8 pt-3 pb-4 shadow-lg bg-dark-brown">
+        <div class="flex items-center justify-between pr-8 border-r border-egg-white">
             <h1 class="text-3xl font-black text-egg-white">eggprices<span class="font-light">.org</span></h1>
         </div>
-        <nav class="flex h-full flex-row items-end justify-between px-8 gap-4 pt-1">
-            <a href="/" class="text-egg-white hover:text-egg-yellow border border-egg-white hover:border-egg-yellow duration-300 border-2 border-transparent rounded-md px-2 py-1">Nationwide Data</a>
-            <a href="/" class="text-egg-yellow opacity-50 hover:text-egg-yellow border border-egg-yellow cursor-not-allowed border-2 border-dotted rounded-md px-2 py-1">Coming soon: Regional Data</a>
+        <nav class="flex flex-row items-end justify-between h-full gap-4 px-8 pt-1">
+            <a href="/" class="px-2 py-1 duration-300 border border-2 border-transparent rounded-md text-egg-white hover:text-egg-yellow border-egg-white hover:border-egg-yellow">Nationwide Data</a>
+            <a href="/" class="px-2 py-1 border border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-egg-yellow hover:text-egg-yellow border-egg-yellow">Coming soon: Regional Data</a>
         </nav>
     </header>
 
     <!-- Main Content -->
-    <main class="w-full flex flex-col items-center flex-grow">
+    <main class="flex flex-col items-center flex-grow w-full">
         <!-- Interactive Chart Section -->
-        <div class="w-full flex flex-col gap-8 lg:flex-row p-8">
-            <section class="bg-egg-white rounded-lg p-6 shadow-md w-full lg:w-2/3">
-                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4">
+        <div class="flex flex-col w-full gap-8 p-8 lg:flex-row">
+            <section class="w-full p-6 rounded-lg shadow-md bg-egg-white lg:w-2/3">
+                <div class="flex flex-col items-start justify-between mb-4 sm:flex-row sm:items-center">
                     <div>
-                        <div class="flex flex-row items-center gap-2 flex-wrap">
+                        <div class="flex flex-row flex-wrap items-center gap-2">
                             <h2 class="text-2xl font-light text-dark-brown text-nowrap">Egg Price Trends</h2>
-                            <div class="text-egg-brown text-sm">
+                            <div class="text-sm text-egg-brown">
                                 <span>Updated every 12 hours</span>
                                 <span class="mx-2">•</span>
                                 <a href="https://www.bls.gov/data/" class="text-egg-brown hover:underline" target="_blank" rel="noopener">
@@ -58,7 +58,7 @@
                                 </a>
                             </div>
                         </div>
-                        <div class="text-sm text-gray-600 mt-1">
+                        <div class="mt-1 text-sm text-gray-600">
                             Average price per dozen, Grade A Large Eggs
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                 <div class="flex flex-row items-center justify-between">
                     <h2 class="text-xl font-semibold text-dark-brown">Quick Insights</h2>
                     <div class="mt-2 sm:mt-0">
-                        <select id="timeScale" class="bg-egg-white border border-egg-brown text-dark-brown px-3 py-1 rounded-md focus:outline-none focus:ring-2 focus:ring-egg-brown">
+                        <select id="timeScale" class="px-3 py-1 border rounded-md bg-egg-white border-egg-brown text-dark-brown focus:outline-none focus:ring-2 focus:ring-egg-brown">
                             <option value="6">6 Months</option>
                             <option value="12">1 Year</option>
                             <option value="24">2 Years</option>
@@ -83,37 +83,37 @@
                     </div>
                 </div>
                 <div class="flex flex-wrap gap-4 mt-4">
-                    <div class="bg-egg-white p-4 rounded-lg shadow flex-grow shadow-md">
+                    <div class="flex-grow p-4 rounded-lg shadow shadow-md bg-egg-white">
                         <h3 class="text-lg font-semibold text-dark-brown">Current Price</h3>
-                        <div class="flex gap-1 items-end">
+                        <div class="flex items-end gap-1">
                             <p id="currentPrice" class="text-3xl font-bold text-egg-brown">--</p>
-                            <span class="text-sm text-gray-500 pb-1">/ dozen</span>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
                         </div>
-                        <p id="currentDate" class="text-sm text-gray-600 mt-1">as of --</p>
+                        <p id="currentDate" class="mt-1 text-sm text-gray-600">as of --</p>
                     </div>
-                    <div class="bg-egg-white p-4 rounded-lg shadow flex-grow shadow-md">
+                    <div class="flex-grow p-4 rounded-lg shadow shadow-md bg-egg-white">
                         <h3 class="text-lg font-semibold text-dark-brown">Average Price</h3>
-                        <div class="flex gap-1 items-end">
+                        <div class="flex items-end gap-1">
                             <p id="averagePrice" class="text-3xl font-bold text-egg-brown">--</p>
-                            <span class="text-sm text-gray-500 pb-1">/ dozen</span>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
                         </div>
-                        <p class="text-sm text-gray-600 mt-1">selected period</p>
+                        <p class="mt-1 text-sm text-gray-600">selected period</p>
                     </div>
-                    <div class="bg-egg-white p-4 rounded-lg shadow flex-grow shadow-md">
+                    <div class="flex-grow p-4 rounded-lg shadow shadow-md bg-egg-white">
                         <h3 class="text-lg font-semibold text-dark-brown">Highest Price</h3>
-                        <div class="flex gap-1 items-end">
+                        <div class="flex items-end gap-1">
                             <p id="highestPrice" class="text-3xl font-bold text-egg-brown">--</p>
-                            <span class="text-sm text-gray-500 pb-1">/ dozen</span>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
                         </div>
-                        <p id="highestDate" class="text-sm text-gray-600 mt-1">reached --</p>
+                        <p id="highestDate" class="mt-1 text-sm text-gray-600">reached --</p>
                     </div>
-                    <div class="bg-egg-white p-4 rounded-lg shadow flex-grow shadow-md">
+                    <div class="flex-grow p-4 rounded-lg shadow shadow-md bg-egg-white">
                         <h3 class="text-lg font-semibold text-dark-brown">Lowest Price</h3>
-                        <div class="flex gap-1 items-end">
+                        <div class="flex items-end gap-1">
                             <p id="lowestPrice" class="text-3xl font-bold text-egg-brown">--</p>
-                            <span class="text-sm text-gray-500 pb-1">/ dozen</span>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
                         </div>
-                        <p id="lowestDate" class="text-sm text-gray-600 mt-1">reached --</p>
+                        <p id="lowestDate" class="mt-1 text-sm text-gray-600">reached --</p>
                     </div>
 
                 </div>
@@ -121,7 +121,7 @@
         </div>
 
         <!-- About and News Grid Section -->
-        <div class="px-8 mb-8 grid grid-cols-[300px_2fr_1fr] gap-8">
+        <div class="px-8 mb-8 lg:grid flex flex-col lg:grid-cols-[300px_2fr_1fr] gap-8">
             <!-- Ad Space -->
             <aside class="space-y-4">
                 <div class="bg-egg-white p-4 rounded-lg shadow-lg h-[600px] flex items-center justify-center text-gray-400">
@@ -132,14 +132,14 @@
             <!-- About Section -->
             <div id="aboutEggPrices" class="space-y-6">
                 <!-- Current Prices Section -->
-                <section class="space-y-4 bg-egg-white p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold border-b-4 border-egg-yellow pb-2">Current Egg Prices and Historical Data
+                <section class="p-4 space-y-4 rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow">Current Egg Prices and Historical Data
                     </h2>
                     <p class="text-lg leading-relaxed text-pretty">
                         Egg prices fluctuate due to supply chain issues, seasonal demand, feed costs, and production trends. At <span class="font-semibold">eggprices.org</span>, we monitor <span class="font-semibold">current egg prices</span> from trusted
                         sources like the <span class="font-semibold">Bureau of Labor Statistics</span>. Our dashboard provides:
                     </p>
-                    <ul class="list-disc list-inside space-y-2">
+                    <ul class="space-y-2 list-disc list-inside">
                         <li><span class="font-semibold">Current average egg prices</span> for large, medium, and specialty eggs.</li>
                         <li><span class="font-semibold">Weekly and monthly trends</span> in egg costs.</li>
                         <li>A comprehensive view of <span class="font-semibold">historical egg prices</span> dating back to 2014.</li>
@@ -147,12 +147,12 @@
                 </section>
 
                 <!-- Why Prices Change Section -->
-                <section class="space-y-4 bg-egg-white p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold border-b-4 border-egg-yellow pb-2">Why Do Egg Prices Change?</h2>
+                <section class="p-4 space-y-4 rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow">Why Do Egg Prices Change?</h2>
                     <p class="text-lg leading-relaxed text-pretty">
                         Understanding the factors that affect <span class="font-semibold">egg prices</span> is crucial. Key drivers include:
                     </p>
-                    <ul class="list-disc list-inside space-y-2">
+                    <ul class="space-y-2 list-disc list-inside">
                         <li><span class="font-semibold">Feed Costs:</span> The price of hen feed impacts production costs.
                         </li>
                         <li><span class="font-semibold">Avian Influenza:</span> Outbreaks reduce supply, driving up prices.
@@ -163,12 +163,12 @@
                 </section>
 
 
-                <section class="space-y-4 bg-egg-white p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold border-b-4 border-egg-yellow pb-2">Egg Price Trends for 2024</h2>
+                <section class="p-4 space-y-4 rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow">Egg Price Trends for 2024</h2>
                     <p class="text-lg leading-relaxed text-pretty">
                         Are <span class="font-semibold">egg prices</span> going up or down in 2024? We provide insights and projections based on historical data and current trends, including:
                     </p>
-                    <ul class="list-disc list-inside space-y-2">
+                    <ul class="space-y-2 list-disc list-inside">
                         <li>Regional variations in <span class="font-semibold">egg prices by state</span>.</li>
                         <li>Comparisons between conventional, organic, and free-range eggs.</li>
                         <li>Forecasts for the cost of eggs in the coming months.</li>
@@ -176,19 +176,19 @@
                 </section>
 
 
-                <section class="space-y-4 bg-egg-white p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold border-b-4 border-egg-yellow pb-2">Frequently Asked Questions</h2>
+                <section class="p-4 space-y-4 rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow">Frequently Asked Questions</h2>
 
                     <div>
-                        <h3 class="font-semibold text-lg">1. What is the average price of a dozen eggs in the US?</h3>
+                        <h3 class="text-lg font-semibold">1. What is the average price of a dozen eggs in the US?</h3>
                         <p class="text-base">The average price varies by state and time of year. As of <span id="currentDateFAQ" class="font-semibold">--</span>, the national average is <span id="currentPriceFAQ" class="font-semibold">--</span>.</p>
                     </div>
                     <div>
-                        <h3 class="font-semibold text-lg">2. Why are egg prices so high?</h3>
+                        <h3 class="text-lg font-semibold">2. Why are egg prices so high?</h3>
                         <p class="text-base">Egg prices increase due to factors like reduced supply, higher production costs, and seasonal demand.</p>
                     </div>
                     <div>
-                        <h3 class="font-semibold text-lg">3. Are organic eggs more expensive?</h3>
+                        <h3 class="text-lg font-semibold">3. Are organic eggs more expensive?</h3>
                         <p class="text-base">Yes, organic eggs typically cost more due to higher production standards and feed costs.</p>
                     </div>
 
@@ -197,21 +197,21 @@
 
 
             <div class="space-y-6">
-                <section class="bg-egg-white p-4 rounded-lg shadow-lg">
-                    <h2 class="text-2xl font-bold border-b-4 border-egg-yellow pb-2 mb-4">Latest Egg News</h2>
-                    <div id="news-loading" class="text-center py-4 text-gray-600">Loading news...</div>
-                    <div id="news-error" class="hidden text-center py-4 text-red-600">Failed to load news</div>
+                <section class="p-4 rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="pb-2 mb-4 text-2xl font-bold border-b-4 border-egg-yellow">Latest Egg News</h2>
+                    <div id="news-loading" class="py-4 text-center text-gray-600">Loading news...</div>
+                    <div id="news-error" class="hidden py-4 text-center text-red-600">Failed to load news</div>
                     <ul id="news-feed" class="space-y-4">
                         <!-- News items will be dynamically injected here -->
                     </ul>
                 </section>
 
 
-                <!-- <section class="bg-egg-white p-4 rounded-lg shadow-lg text-center">
-                    <h2 class="text-xl font-bold mb-2">Get Updates</h2>
-                    <p class="text-sm mb-4">Stay informed about egg price changes</p>
+                <!-- <section class="p-4 text-center rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="mb-2 text-xl font-bold">Get Updates</h2>
+                    <p class="mb-4 text-sm">Stay informed about egg price changes</p>
                     <button
-                        class="bg-egg-yellow text-dark-brown font-semibold px-8 py-2 rounded-lg hover:bg-egg-brown hover:text-egg-white transition">
+                        class="px-8 py-2 font-semibold transition rounded-lg bg-egg-yellow text-dark-brown hover:bg-egg-brown hover:text-egg-white">
                         Subscribe
                     </button>
                 </section> -->
@@ -220,7 +220,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-egg-brown text-egg-white py-4 mt-auto">
+    <footer class="py-4 mt-auto bg-egg-brown text-egg-white">
         <div class="max-w-6xl mx-auto text-center">
             <p>&copy; 2025 EggPrices.org. All rights reserved.</p>
         </div>
@@ -420,7 +420,7 @@
                 const articles = await response.json();
 
                 if (articles.length === 0) {
-                    feed.innerHTML = '<li class="text-center py-4 text-gray-600">No news articles available</li>';
+                    feed.innerHTML = '<li class="py-4 text-center text-gray-600">No news articles available</li>';
                     return;
                 }
 
@@ -437,9 +437,9 @@
                     const item = document.createElement('li');
                     item.classList.add('border-b', 'border-gray-200', 'last:border-0', 'pb-3', 'last:pb-0');
                     item.innerHTML = `
-            <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="group block hover:bg-gray-50 transition duration-75 rounded p-2 -mx-2">
+            <a href="${article.link}" target="_blank" rel="noopener noreferrer" class="block p-2 -mx-2 transition duration-75 rounded group hover:bg-gray-50">
               <h3 class="text-sm font-semibold text-egg-brown">${article.title}</h3>
-              <p class="text-xs text-gray-600 mt-1">${formattedDate}</p>
+              <p class="mt-1 text-xs text-gray-600">${formattedDate}</p>
             </a>
           `;
                     feed.appendChild(item);
