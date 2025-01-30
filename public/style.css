@@ -740,6 +740,10 @@ video {
   height: 100vh;
 }
 
+.h-\[100svh\] {
+  height: 100svh;
+}
+
 .min-h-screen {
   min-height: 100vh;
 }
@@ -1577,6 +1581,10 @@ video {
 @media (min-width: 768px) {
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md\:flex-row {
+    flex-direction: row;
   }
 
   .md\:text-3xl {

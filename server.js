@@ -6,6 +6,10 @@ const cron = require("node-cron");
 const Parser = require('rss-parser');
 const parser = new Parser();
 
+
+const { SitemapStream, streamToPromise } = require('sitemap');
+const { Readable } = require('stream');
+
 const app = express();
 const PORT = 3000;
 
@@ -14,6 +18,42 @@ const CACHE_FILE = path.join(__dirname, "cache.json");
 
 // Cache validity duration in milliseconds (12 hours)
 const CACHE_DURATION = 12 * 60 * 60 * 1000;
+
+// Example: Replace with your actual data source for URLs
+const fetchURLs = async() => {
+    return [
+        { url: '/', changefreq: 'daily', priority: 1.0 },
+        { url: '/national-data', changefreq: 'daily', priority: 0.9 },
+    ];
+};
+
+const generateSitemap = async() => {
+    try {
+        const baseUrl = 'https://eggprices.org'; // Replace with your site's URL
+        const urls = await fetchURLs();
+
+        const sitemap = new SitemapStream({ hostname: baseUrl });
+
+        urls.forEach(({ url, changefreq, priority }) => {
+            sitemap.write({ url, changefreq, priority });
+        });
+
+        sitemap.end();
+
+        // Convert the stream to a promise
+        const sitemapXml = await streamToPromise(sitemap);
+
+        // Save the sitemap to a file
+        const sitemapPath = path.join(__dirname, 'public', 'sitemap.xml');
+        fs.writeFileSync(sitemapPath, sitemapXml);
+
+        console.log('Sitemap generated successfully:', sitemapPath);
+    } catch (error) {
+        console.error('Error generating sitemap:', error);
+    }
+};
+
+// generateSitemap();
 
 // Middleware to serve static files
 app.use(express.static("public"));
@@ -243,6 +283,9 @@ app.get("/api/egg-prices", async(req, res) => {
 app.get('/national-data', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'national-data.html'));
 });
+
+
+
 
 // Start the server
 app.listen(PORT, () => {
