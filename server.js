@@ -117,6 +117,15 @@ app.post("/api/force-update", async(req, res) => {
     }
 });
 
+app.post("/api/force-update-news", async(req, res) => {
+    try {
+        const articles = await fetchEggNewsRSS();
+        res.json(articles);
+    } catch (error) {
+        res.status(500).json({ error: "Failed to update news cache." });
+    }
+});
+
 // Add the RSS feed function
 async function fetchEggNewsRSS() {
     const RSS_FEED_URL = 'https://news.google.com/rss/search?q=egg+prices+US&hl=en-US&gl=US&ceid=US:en';
@@ -134,12 +143,11 @@ async function fetchEggNewsRSS() {
     try {
         const feed = await parser.parseURL(RSS_FEED_URL);
         const articles = feed.items
-            .slice(0, 10) // Limit to 10 articles
+            .slice(0, 12) // Limit to 12 articles
             .map(item => ({
                 title: item.title,
                 link: item.link,
-                pubDate: item.pubDate,
-                // Add additional fields if needed
+                pubDate: item.pubDate
             }));
 
         // Cache the results
@@ -157,6 +165,7 @@ async function fetchEggNewsRSS() {
         throw error;
     }
 }
+
 
 // Update the news endpoint to include better error handling
 app.get('/api/news', async(req, res) => {
@@ -199,6 +208,41 @@ function getMonthNumber(periodName) {
     };
     return months[periodName] || 1;
 }
+
+// Route to serve data
+app.get("/api/egg-prices", async(req, res) => {
+    try {
+        let data = getCachedData();
+        const months = parseInt(req.query.months) || 120; // Default to 10 years (120 months)
+
+        if (!data) {
+            // Only fetch new data if cache doesn't exist at all
+            data = await fetchEggPrices();
+        }
+        // Note: We're now using cached data even if expired, to reduce API calls
+
+        // Filter data based on requested months
+        const currentDate = new Date();
+        const filteredData = data.data.filter(item => {
+            const itemDate = new Date(item.year, getMonthNumber(item.periodName) - 1);
+            const monthsDiff = (currentDate.getFullYear() - itemDate.getFullYear()) * 12 +
+                (currentDate.getMonth() - itemDate.getMonth());
+            return monthsDiff <= months;
+        });
+
+        res.json({
+            data: filteredData,
+            lastUpdated: new Date(data.timestamp).toISOString(),
+        });
+    } catch (error) {
+        res.status(500).json({ error: "Failed to fetch data." });
+    }
+});
+
+// Add this new route
+app.get('/national-data', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'national-data.html'));
+});
 
 // Start the server
 app.listen(PORT, () => {

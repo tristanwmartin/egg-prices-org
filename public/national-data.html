@@ -1,0 +1,686 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Stay updated on nationwide egg prices and trends. Our interactive chart and insights help you understand egg price fluctuations and make informed decisions.">
+    <title>Nationwide Egg Prices - Stay Updated on Trends & Costs | EggPrices.org</title>
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <style>
+        /* Egg-themed colors */
+        
+         :root {
+            --egg-yellow: #F2DA8A;
+            --egg-white: #f5f0e6;
+            --egg-brown: #d68c45;
+            --dark-brown: #4b2e15;
+            --light-gray: #f4f4f4;
+            --democrat-blue: rgba(32, 74, 135, 0.1);
+            --republican-red: rgba(164, 0, 0, 0.1);
+        }
+    </style>
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2563739074608905" crossorigin="anonymous"></script>
+</head>
+
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-JP84MQTPPG"></script>
+<script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    gtag('js', new Date());
+
+    gtag('config', 'G-JP84MQTPPG');
+</script>
+
+<style>
+    .zigzag-underline,
+    .zigzag-underline-white,
+    .zigzag-underline-light-gray {
+        position: relative;
+    }
+    
+    .zigzag-underline::after {
+        position: absolute;
+        content: '';
+        background: linear-gradient(-135deg, var(--egg-brown) 8px, transparent 0), linear-gradient(135deg, var(--egg-brown) 8px, transparent 0);
+        background-repeat: repeat-x;
+        background-position-x: 7px;
+        background-size: 15px;
+        bottom: -28px;
+        left: 0;
+        width: 100%;
+        height: 32px;
+    }
+    
+    .zigzag-underline-white::after {
+        position: absolute;
+        content: '';
+        background: linear-gradient(-135deg, white 8px, transparent 0), linear-gradient(135deg, white 8px, transparent 0);
+        background-repeat: repeat-x;
+        background-position-x: 7px;
+        background-size: 15px;
+        bottom: -28px;
+        left: 0;
+        width: 100%;
+        height: 32px;
+    }
+    
+    .zigzag-underline-light-gray::after {
+        position: absolute;
+        content: '';
+        background: linear-gradient(-135deg, var(--light-gray) 8px, transparent 0), linear-gradient(135deg, var(--light-gray) 8px, transparent 0);
+        background-repeat: repeat-x;
+        background-position-x: 7px;
+        background-size: 15px;
+        bottom: -28px;
+        left: 0;
+        width: 100%;
+        height: 32px;
+    }
+    
+    @keyframes shake {
+        0% {
+            transform: rotate(0deg);
+        }
+        5% {
+            transform: rotate(-8deg);
+        }
+        8% {
+            transform: rotate(8deg);
+        }
+        12% {
+            transform: rotate(-7deg);
+        }
+        18% {
+            transform: rotate(7deg);
+        }
+        25% {
+            transform: rotate(-6deg);
+        }
+        35% {
+            transform: rotate(6deg);
+        }
+        50% {
+            transform: rotate(-4deg);
+        }
+        65% {
+            transform: rotate(3deg);
+        }
+        80% {
+            transform: rotate(-2deg);
+        }
+        95% {
+            transform: rotate(1deg);
+        }
+        100% {
+            transform: rotate(0deg);
+        }
+    }
+    
+    .hover-shake:hover {
+        animation: shake 3s cubic-bezier(0.36, 0, 0.66, -0.56) forwards;
+        transform-origin: 50% 50%;
+    }
+</style>
+
+<body class="relative flex flex-col min-h-screen overflow-x-hidden text-gray-800 font-host bg-light-gray">
+    <!-- Header -->
+    <header class="flex flex-row items-center justify-start px-8 pt-3 pb-4 bg-light-gray">
+        <a href="/" class="flex items-center justify-between gap-2 pr-8 border-r cursor-pointer border-dark-brown">
+            <svg class="size-8 hover-shake" xmlns="http://www.w3.org/2000/svg" id="ep-logo-svg" viewBox="0 0 256 256">
+                <path class="fill-egg-brown" d="M76.26,117.57c1.37-1.37,3.24-2.15,5.18-2.15s3.81.77,5.18,2.15l31.74,31.74,53.83-53.83c2.86-2.86,7.5-2.86,10.36,0l35.25,35.25c8.02-40.85,5.32-87.43-25.25-108.31l-4.33-2.31C134.94-.84,68.46,65.8,46.93,109.79c-7.87,15.52-12.83,32.76-12.6,49.71l41.93-41.93Z"/>
+                <path class="fill-dark-brown" d="M177.38,111.03l-53.83,53.83c-2.86,2.86-7.5,2.86-10.36,0l-31.74-31.74-43.53,43.53c-.37.37-.77.69-1.2.96,1.9,7.3,4.98,14.4,9.46,21.13,15.81,23.97,48.48,41.39,77.21,41.13,32.74-.17,58.06-22.82,73.32-50.13l4.07-7.62c4.87-9.55,9.45-21.5,13.08-34.61l-36.47-36.47Z"/>
+            </svg>
+            <h1 class="text-3xl font-black text-dark-brown">EggPrices<span class="font-light">.org</span></h1>
+        </a>
+
+        <!-- Mobile menu button -->
+        <button id="mobile-menu-button" class="p-2 ml-auto rounded-md lg:hidden hover:bg-egg-brown/10 focus:outline-none focus:ring-2 focus:ring-egg-brown" aria-expanded="false" aria-controls="mobile-menu" aria-label="Toggle navigation menu">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-dark-brown" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+            </svg>
+        </button>
+
+        <!-- Desktop Navigation -->
+        <nav class="items-end justify-between hidden h-full gap-4 px-8 pt-1 lg:flex">
+            <a href="/national-data" class="px-2 py-1 duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Nationwide Data</a>
+            <a href="" class="px-2 py-1 border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-dark-brown hover:text-egg-brown border-egg-brown">Coming soon: Regional Data</a>
+        </nav>
+
+        <!-- Mobile Navigation -->
+        <div id="mobile-menu" class="absolute inset-0 top-0 z-50 flex flex-col justify-between hidden w-full h-screen p-4 pb-16 mt-2 transition-transform duration-300 translate-y-full bg-white shadow-lg" aria-labelledby="mobile-menu-button">
+            <div class="flex items-center justify-between pt-4 pb-8 mb-8 border-b border-dark-brown">
+                <a href="/" class="flex items-center gap-2 cursor-pointer">
+                    <svg class="size-8 hover-shake" xmlns="http://www.w3.org/2000/svg" id="ep-logo-svg" viewBox="0 0 256 256">
+                        <path class="fill-egg-brown" d="M76.26,117.57c1.37-1.37,3.24-2.15,5.18-2.15s3.81.77,5.18,2.15l31.74,31.74,53.83-53.83c2.86-2.86,7.5-2.86,10.36,0l35.25,35.25c8.02-40.85,5.32-87.43-25.25-108.31l-4.33-2.31C134.94-.84,68.46,65.8,46.93,109.79c-7.87,15.52-12.83,32.76-12.6,49.71l41.93-41.93Z"/>
+                        <path class="fill-dark-brown" d="M177.38,111.03l-53.83,53.83c-2.86,2.86-7.5,2.86-10.36,0l-31.74-31.74-43.53,43.53c-.37.37-.77.69-1.2.96,1.9,7.3,4.98,14.4,9.46,21.13,15.81,23.97,48.48,41.39,77.21,41.13,32.74-.17,58.06-22.82,73.32-50.13l4.07-7.62c4.87-9.55,9.45-21.5,13.08-34.61l-36.47-36.47Z"/>
+                    </svg>
+                    <h1 class="text-3xl font-black text-dark-brown">EggPrices<span class="font-light">.org</span></h1>
+                </a>
+                <button onclick="toggleMenu()" class="p-2 rounded-md hover:bg-egg-brown/10 focus:outline-none focus:ring-2 focus:ring-egg-brown" aria-label="Close menu">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-dark-brown" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                </button>
+            </div>
+            <nav class="flex flex-col space-y-4">
+                <a href="/" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Home</a>
+                <a href="/national-data" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Nationwide Data</a>
+                <a href="" class="p-4 text-4xl border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-dark-brown hover:text-egg-brown border-egg-brown">Coming soon: <br>Regional Data</a>
+            </nav>
+        </div>
+    </header>
+
+
+
+    <script>
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+
+        function toggleMenu() {
+            const isExpanded = mobileMenuButton.getAttribute('aria-expanded') === 'true';
+            mobileMenuButton.setAttribute('aria-expanded', !isExpanded);
+
+            // Instead of toggling hidden, we manage visibility with transform
+            if (!isExpanded) {
+                mobileMenu.classList.remove('hidden');
+                // Use setTimeout to ensure the element is in DOM before animating
+                setTimeout(() => {
+                    mobileMenu.classList.remove('translate-y-full');
+                }, 0);
+            } else {
+                mobileMenu.classList.add('translate-y-full');
+                // Wait for transition to complete before hiding
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+            }
+
+            // Toggle body scroll
+            if (!isExpanded) {
+                document.body.style.overflow = 'hidden';
+            } else {
+                document.body.style.overflow = '';
+            }
+
+            // Update the menu icon
+            const svg = mobileMenuButton.querySelector('svg');
+            if (!isExpanded) {
+                svg.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                `;
+            } else {
+                svg.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                `;
+            }
+        }
+
+        mobileMenuButton.addEventListener('click', toggleMenu);
+
+        // Close menu when clicking outside
+        document.addEventListener('click', (event) => {
+            if (!mobileMenuButton.contains(event.target) && !mobileMenu.contains(event.target)) {
+                mobileMenuButton.setAttribute('aria-expanded', 'false');
+                mobileMenu.classList.add('translate-y-full');
+                setTimeout(() => {
+                    mobileMenu.classList.add('hidden');
+                }, 300);
+                document.body.style.overflow = '';
+                const svg = mobileMenuButton.querySelector('svg');
+                svg.innerHTML = `
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+                `;
+            }
+        });
+
+        // Handle escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape' && mobileMenuButton.getAttribute('aria-expanded') === 'true') {
+                toggleMenu();
+            }
+        });
+    </script>
+
+    <div class="flex flex-col items-center justify-center py-8 mx-8 text-center border-b bg-light-gray border-egg-brown">
+        <h1 class="text-6xl font-black text-dark-brown font-teko text-balance">
+            Live U.S. Egg Price Chart <br><span class="font-medium">Track National Average Egg Prices & Trends</span>
+        </h1>
+        <p class="py-4 text-lg prose text-dark-brown text-balance max-w-prose">
+            View the latest national average egg prices with data from the Bureau of Labor Statistics (BLS). This live egg price chart is updated monthly, reflecting how often the BLS reports new pricing data. Here you can view trends over time, compare historical
+            and recent prices, and see how costs fluctuate throughout the year.
+        </p>
+    </div>
+    <!-- Main Content -->
+    <main class="flex flex-col items-center flex-grow w-full mt-4">
+        <!-- Interactive Chart Section -->
+        <div class="flex flex-col w-full gap-8 shadow-lg lg:flex-row bg-light-gray zigzag-underline-light-gray">
+            <section class="w-full px-8 lg:p-8 lg:pr-0 lg:w-3/5">
+                <div class="flex flex-col items-start justify-between mb-4 sm:flex-row sm:items-center">
+                    <div>
+                        <div class="flex flex-col flex-wrap items-start gap-2">
+                            <h2 class="text-xl font-semibold md:text-3xl text-dark-brown text-nowrap font-teko">Average price per dozen, Grade A Large Eggs</h2>
+                            <div class="text-sm text-egg-brown">
+                                <span>Updated every 12 hours</span>
+                                <span class="mx-2">•</span>
+                                <a href="https://www.bls.gov/data/" class="text-egg-brown hover:underline" target="_blank" rel="noopener">
+                                    Source: Bureau of Labor Statistics <span class="text-xs">(APU0000708111)</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="eggPriceChartContainer" class="w-full h-64 sm:h-96">
+                    <canvas id="eggPriceChart" class="w-full"></canvas>
+                </div>
+            </section>
+            <!-- Summary Section -->
+            <section class="w-full pt-8 max-lg:px-8 lg:pr-8 lg:w-2/5">
+                <div class="flex flex-row items-start justify-between">
+                    <h2 class="text-3xl font-light text-dark-brown font-teko">Quick Insights</h2>
+                    <div class="flex flex-col mt-2 sm:mt-0">
+                        <label for="timeScale" class="sr-only">Select time period for data display</label>
+                        <label for="timeScale" class="pb-1 text-sm text-egg-brown">Time period</label>
+                        <select id="timeScale" name="timeScale" aria-label="Time period selector" class="px-3 py-1 border rounded-md bg-egg-white border-egg-brown text-dark-brown focus:outline-none focus:ring-2 focus:ring-egg-brown">
+                            <option value="6">6 Months</option>
+                            <option value="12">1 Year</option>
+                            <option value="24">2 Years</option>
+                            <option value="36">3 Years</option>
+                            <option value="60">5 Years</option>
+                            <option value="120" selected>10 Years</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex flex-wrap gap-px mt-4 mb-8 divide-egg-brown bg-egg-brown/50">
+                    <div class="flex-grow p-4 bg-light-gray">
+                        <h3 class="text-lg font-semibold max-lg:text-center text-dark-brown">Current Price</h3>
+                        <div class="flex items-end gap-1 max-lg:justify-center">
+                            <p id="currentPrice" class="text-3xl font-bold text-egg-brown">--</p>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
+                        </div>
+                        <p id="currentDate" class="mt-1 text-xs text-gray-600 max-lg:text-center">as of --</p>
+                    </div>
+                    <div class="flex-grow p-4 bg-light-gray">
+                        <h3 class="text-lg font-semibold text-dark-brown max-lg:text-center">Average Price</h3>
+                        <div class="flex items-end gap-1 max-lg:justify-center">
+                            <p id="averagePrice" class="text-3xl font-bold text-egg-brown">--</p>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
+                        </div>
+                        <p class="mt-1 text-xs text-gray-600 max-lg:text-center">selected period</p>
+                    </div>
+                    <div class="flex-grow p-4 bg-light-gray">
+                        <h3 class="text-lg font-semibold text-dark-brown max-lg:text-center">Highest Price</h3>
+                        <div class="flex items-end gap-1 max-lg:justify-center">
+                            <p id="highestPrice" class="text-3xl font-bold text-egg-brown">--</p>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
+                        </div>
+                        <p id="highestDate" class="mt-1 text-xs text-gray-600 max-lg:text-center">reached --</p>
+                    </div>
+                    <div class="flex-grow p-4 bg-light-gray">
+                        <h3 class="text-lg font-semibold text-dark-brown max-lg:text-center">Lowest Price</h3>
+                        <div class="flex items-end gap-1 max-lg:justify-center">
+                            <p id="lowestPrice" class="text-3xl font-bold text-egg-brown">--</p>
+                            <span class="pb-1 text-sm text-gray-500">/ dozen</span>
+                        </div>
+                        <p id="lowestDate" class="mt-1 text-xs text-gray-600 max-lg:text-center">reached --</p>
+                    </div>
+
+                </div>
+            </section>
+        </div>
+
+        <!-- About and News Grid Section -->
+        <div class="px-8 py-16 mb-8 lg:grid flex flex-col lg:grid-cols-[2fr_1fr] gap-8 bg-egg-white">
+
+            <!-- About Section -->
+            <div id="aboutEggPrices" class="space-y-6">
+                <!-- Current Prices Section -->
+                <section class="p-4 space-y-4">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow font-teko">Current Egg Prices and Historical Data
+                    </h2>
+                    <p class="text-lg leading-relaxed text-pretty">
+                        Egg prices fluctuate due to supply chain issues, seasonal demand, feed costs, and production trends. At <span class="font-semibold">eggprices.org</span>, we monitor <span class="font-semibold">current egg prices</span> from trusted
+                        sources like the <span class="font-semibold">Bureau of Labor Statistics</span>. Our dashboard provides:
+                    </p>
+                    <ul class="space-y-2 list-disc list-inside">
+                        <li><span class="font-semibold">Current average egg prices</span> for large, medium, and specialty eggs.</li>
+                        <li><span class="font-semibold">Weekly and monthly trends</span> in egg costs.</li>
+                        <li>A comprehensive view of <span class="font-semibold">historical egg prices</span> dating back to 2014.</li>
+                    </ul>
+                </section>
+
+                <!-- Why Prices Change Section -->
+                <section class="p-4 space-y-4">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow font-teko">Why Do Egg Prices Change?</h2>
+                    <p class="text-lg leading-relaxed text-pretty">
+                        Understanding the factors that affect <span class="font-semibold">egg prices</span> is crucial. Key drivers include:
+                    </p>
+                    <ul class="space-y-2 list-disc list-inside">
+                        <li><span class="font-semibold">Feed Costs:</span> The price of hen feed impacts production costs.
+                        </li>
+                        <li><span class="font-semibold">Avian Influenza:</span> Outbreaks reduce supply, driving up prices.
+                        </li>
+                        <li><span class="font-semibold">Consumer Demand:</span> Holiday seasons and baking trends increase demand.</li>
+                        <li><span class="font-semibold">Economic Conditions:</span> Inflation and supply chain disruptions also play a role.</li>
+                    </ul>
+                </section>
+
+
+                <section class="p-4 space-y-4">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow font-teko">Egg Price Trends for 2024</h2>
+                    <p class="text-lg leading-relaxed text-pretty">
+                        Are <span class="font-semibold">egg prices</span> going up or down in 2024? We provide insights and projections based on historical data and current trends, including:
+                    </p>
+                    <ul class="space-y-2 list-disc list-inside">
+                        <li>Regional variations in <span class="font-semibold">egg prices by state</span>.</li>
+                        <li>Comparisons between conventional, organic, and free-range eggs.</li>
+                        <li>Forecasts for the cost of eggs in the coming months.</li>
+                    </ul>
+                </section>
+
+
+                <section class="p-4 space-y-4">
+                    <h2 class="pb-2 text-2xl font-bold border-b-4 border-egg-yellow font-teko">Frequently Asked Questions</h2>
+
+                    <div>
+                        <h3 class="text-lg font-semibold">1. What is the average price of a dozen eggs in the US?</h3>
+                        <p class="text-base">The average price varies by state and time of year. As of <span id="currentDateFAQ" class="font-semibold">--</span>, the national average is <span id="currentPriceFAQ" class="font-semibold">--</span>.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">2. Why are egg prices so high?</h3>
+                        <p class="text-base">Egg prices increase due to factors like reduced supply, higher production costs, and seasonal demand.</p>
+                    </div>
+                    <div>
+                        <h3 class="text-lg font-semibold">3. Are organic eggs more expensive?</h3>
+                        <p class="text-base">Yes, organic eggs typically cost more due to higher production standards and feed costs.</p>
+                    </div>
+
+                </section>
+            </div>
+
+
+            <div class="space-y-6">
+                <section class="p-4">
+                    <h2 class="pb-2 mb-4 text-2xl font-bold border-b-4 border-egg-yellow font-teko text-balance">Latest Egg Price News from Across the Web</h2>
+                    <div id="news-loading" class="py-4 text-center text-gray-600">Loading news...</div>
+                    <div id="news-error" class="hidden py-4 text-center text-red-600">Failed to load news</div>
+                    <ul id="news-feed" class="space-y-4">
+                        <!-- News items will be dynamically injected here -->
+                    </ul>
+                </section>
+
+
+                <!-- <section class="p-4 text-center rounded-lg shadow-lg bg-egg-white">
+                    <h2 class="mb-2 text-xl font-bold">Get Updates</h2>
+                    <p class="mb-4 text-sm">Stay informed about egg price changes</p>
+                    <button
+                        class="px-8 py-2 font-semibold transition rounded-lg bg-egg-yellow text-dark-brown hover:bg-egg-brown hover:text-egg-white">
+                        Subscribe
+                    </button>
+                </section> -->
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 mt-auto bg-egg-brown text-egg-white">
+        <div class="max-w-6xl mx-auto text-center">
+            <p>&copy; 2025 EggPrices.org. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        let currentChart = null; // Store the chart instance globally
+
+        document.getElementById('timeScale').addEventListener('change', function(e) {
+            const months = parseInt(e.target.value);
+            fetchEggPrices(months);
+        });
+
+        async function fetchEggPrices(months = 120) {
+            try {
+                const response = await fetch(`/api/egg-prices?months=${months}`);
+                const result = await response.json();
+                const {
+                    data
+                } = result;
+
+                // Prepare data for the chart
+                const labels = data.map(item => item.periodName + ' ' + item.year);
+                const prices = data.map(item => parseFloat(item.value));
+
+                labels.reverse();
+                prices.reverse();
+
+                // Destroy existing chart if it exists
+                if (currentChart) {
+                    currentChart.destroy();
+                }
+
+                // Create new chart
+                const ctx = document.getElementById("eggPriceChart").getContext("2d");
+                currentChart = new Chart(ctx, {
+                    type: "line",
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: "Egg Prices",
+                            data: prices,
+                            borderColor: "var(--egg-brown)",
+                            backgroundColor: "rgba(214, 140, 69, 0.1)",
+                            borderWidth: 4,
+                            tension: 0.4,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 3,
+                            pointHoverBackgroundColor: "var(--egg-yellow)",
+                            pointHoverBorderColor: "var(--dark-brown)",
+                            pointHoverBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        height: 200,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false, // This enables hover anywhere on the x-axis
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }, // Remove legend since we only have one dataset
+                            tooltip: {
+                                backgroundColor: 'rgba(244, 244, 244, 0.9)',
+                                titleFont: {
+                                    family: "'Host Grotesk', sans-serif",
+                                    size: 16,
+                                    weight: 'bold',
+                                },
+                                titleColor: 'rgba(0, 0, 0, 0.9)',
+                                bodyFont: {
+                                    family: "'Host Grotesk', sans-serif",
+                                    size: 20,
+                                    weight: 'bold',
+                                },
+                                bodyColor: 'var(--egg-yellow)',
+                                padding: 12,
+                                displayColors: false, // removes the color box in tooltip
+                                callbacks: {
+                                    title: function(context) {
+                                        return context[0].label; // Date/period
+                                    },
+                                    label: function(context) {
+                                        return `$${context.raw.toFixed(2)} / dozen`; // Price formatted as currency
+                                    }
+                                }
+                            },
+                            annotation: {
+                                annotations: {
+                                    presidentalTerms: [{
+                                        type: 'box',
+                                        xMin: '2014 Jan',
+                                        xMax: '2017 Jan',
+                                        backgroundColor: 'var(--democrat-blue)',
+                                        borderWidth: 0,
+                                        drawTime: 'beforeDatasetsDraw'
+                                    }, {
+                                        type: 'box',
+                                        xMin: '2017 Jan',
+                                        xMax: '2021 Jan',
+                                        backgroundColor: 'var(--republican-red)',
+                                        borderWidth: 0,
+                                        drawTime: 'beforeDatasetsDraw'
+                                    }, {
+                                        type: 'box',
+                                        xMin: '2021 Jan',
+                                        xMax: labels[labels.length - 1], // Current date
+                                        backgroundColor: 'var(--democrat-blue)',
+                                        borderWidth: 0,
+                                        drawTime: 'beforeDatasetsDraw'
+                                    }]
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false // removes vertical grid lines
+                                },
+                                ticks: {
+                                    font: {
+                                        family: "'Host Grotesk', sans-serif",
+                                        size: 12
+                                    }
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(75, 46, 21, 0.1)', // subtle horizontal grid lines
+                                },
+                                ticks: {
+                                    font: {
+                                        family: "'Host Grotesk', sans-serif",
+                                        size: 12
+                                    },
+                                    callback: function(value) {
+                                        return '$' + value.toFixed(2); // Format y-axis labels as currency
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                console.log(data);
+                // Update insights with dates
+                const lastDataPoint = data[0];
+                const currentDate = `${lastDataPoint.periodName} ${lastDataPoint.year}`;
+                document.getElementById("currentPrice").textContent = `$${prices[prices.length - 1].toFixed(2)}`;
+                document.getElementById("currentDate").textContent = `as of ${currentDate}`;
+                document.getElementById("currentDateFAQ").textContent = `${currentDate}`;
+                document.getElementById("currentPriceFAQ").textContent = `$${prices[prices.length - 1].toFixed(2)}`;
+
+                const highestPrice = Math.max(...prices);
+                const highestIndex = prices.indexOf(highestPrice);
+                const highestDate = `${data[prices.length - 1 - highestIndex].periodName} ${data[prices.length - 1 - highestIndex].year}`;
+                document.getElementById("highestPrice").textContent = `$${highestPrice.toFixed(2)}`;
+                document.getElementById("highestDate").textContent = `reached ${highestDate}`;
+
+                const lowestPrice = Math.min(...prices);
+                const lowestIndex = prices.indexOf(lowestPrice);
+                const lowestDate = `${data[prices.length - 1 - lowestIndex].periodName} ${data[prices.length - 1 - lowestIndex].year}`;
+                document.getElementById("lowestPrice").textContent = `$${lowestPrice.toFixed(2)}`;
+                document.getElementById("lowestDate").textContent = `reached ${lowestDate}`;
+
+                const avgPrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+                document.getElementById("averagePrice").textContent = `$${avgPrice.toFixed(2)}`;
+            } catch (error) {
+                console.error("Failed to fetch egg prices:", error);
+            }
+        }
+
+        // Load data on page load
+        window.onload = () => fetchEggPrices();
+    </script>
+
+    <script>
+        async function fetchNews() {
+            const feed = document.getElementById('news-feed');
+            const loading = document.getElementById('news-loading');
+            const error = document.getElementById('news-error');
+
+            try {
+                loading.style.display = 'block';
+                error.style.display = 'none';
+                feed.innerHTML = '';
+
+                const response = await fetch('/api/news');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const articles = await response.json();
+
+                if (articles.length === 0) {
+                    feed.innerHTML = '<li class="py-4 text-center text-gray-600">No news articles available</li>';
+                    return;
+                }
+
+                articles.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+                articles.forEach((article) => {
+                    const date = new Date(article.pubDate);
+                    const formattedDate = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+
+                    const item = document.createElement('li');
+                    item.classList.add('border-b', 'border-gray-200', 'last:border-0', 'pb-3', 'last:pb-0');
+                    item.innerHTML = `
+            <div class="transition-shadow bg-white rounded-lg shadow-md group hover:shadow-lg zigzag-underline-white">
+                        <a href="${article.link}" target="_blank" rel="noopener noreferrer" 
+                           class="flex flex-col justify-between h-full gap-2 pl-4 pr-4 duration-300 border-t-4 border-transparent group-hover:border-egg-brown transition-border">
+                            <h3 class="pt-4 text-xl font-bold text-gray-800 font-teko">${article.title}</h3>
+                            <div class="w-full border-b border-egg-yellow"></div>
+                            <p class="pb-4 pr-8 text-sm text-gray-600">${new Date(article.pubDate).toLocaleDateString('en-US', {
+                                weekday: 'long',
+                                year: 'numeric', 
+                                month: 'long', 
+                                day: 'numeric',
+                                hour: 'numeric',
+                                minute: 'numeric'
+                            })}</p>
+                        </a>
+                    </div>
+          `;
+                    feed.appendChild(item);
+                });
+            } catch (error) {
+                console.error('Error fetching news:', error);
+                error.style.display = 'block';
+                error.textContent = 'Failed to load news. Please try again later.';
+            } finally {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Load news on page load
+        fetchNews();
+    </script>
+</body>
+
+</html>
