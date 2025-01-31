@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Stay updated on nationwide egg prices and trends. Our interactive chart and insights help you understand egg price fluctuations and make informed decisions.">
-    <title>Nationwide Egg Prices - Stay Updated on Trends & Costs | EggPrices.org</title>
+    <title>EggPrices.org | Nationwide Egg Prices - Stay Updated on Trends & Costs</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="stylesheet" href="style.css?v=1.0.1">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -23,8 +23,6 @@
             --egg-brown: #d68c45;
             --dark-brown: #4b2e15;
             --light-gray: #f4f4f4;
-            --democrat-blue: rgba(32, 74, 135, 0.1);
-            --republican-red: rgba(164, 0, 0, 0.1);
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2563739074608905" crossorigin="anonymous"></script>
@@ -111,7 +109,8 @@
         <!-- Desktop Navigation -->
         <nav class="items-end justify-between hidden h-full gap-4 px-8 pt-1 lg:flex">
             <a href="/national-data" class="px-2 py-1 duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Nationwide Data</a>
-            <a href="" class="px-2 py-1 border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-dark-brown hover:text-egg-brown border-egg-brown">Coming soon: Regional Data</a>
+
+            <a href="/about" class="px-2 py-1 duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">About</a>
         </nav>
 
         <!-- Mobile Navigation -->
@@ -133,7 +132,8 @@
             <nav class="flex flex-col space-y-4">
                 <a href="/" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Home</a>
                 <a href="/national-data" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Nationwide Data</a>
-                <a href="" class="p-4 text-4xl border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-dark-brown hover:text-egg-brown border-egg-brown">Coming soon: <br>Regional Data</a>
+
+                <a href="/about" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">About</a>
             </nav>
         </div>
     </header>
@@ -242,7 +242,9 @@
 
     </main>
 
-    <section id="egg-articles" class="w-full px-16 py-12 bg-egg-white">
+    <section id="egg-articles" class="relative w-full px-16 py-12">
+        <div class="absolute inset-0 -z-[5] bg-egg-white mix-blend-soft-light"></div>
+        <div class="absolute inset-0 bg-opacity-0 -z-10 lazy" data-bg="img/carton-text.webp" style="background-size: 50%; background-repeat: repeat;"></div>
         <style>
             .zigzag-underline,
             .zigzag-underline-white {
@@ -277,7 +279,7 @@
         </style>
         <h2 class="px-4 pt-2 pb-1 mb-12 text-4xl font-black tracking-wide text-gray-50 font-teko w-fit zigzag-underline bg-egg-brown">Eggs-plore the Data</h2>
         <p class="mb-12 text-lg text-gray-600">
-            Explore the egg prices in the United States with interactive charts and fresh data. Whether costs are rising or staying over-easy, we’ve got the scoop to help you crack the trends.
+            Explore the egg prices in the United States with interactive charts and fresh data. Whether costs are rising or staying over-easy, we've got the scoop to help you crack the trends.
         </p>
         <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
             <!-- Example Article Card -->
@@ -407,17 +409,20 @@
                 } = result;
 
                 // Get the most recent data point
-                const lastDataPoint = data[0];
+                const lastDataPoint = data[data.length - 1]; // Get last item since data is sorted by date
                 const currentPrice = parseFloat(lastDataPoint.value);
-                const currentDate = `${lastDataPoint.periodName} ${lastDataPoint.year}`;
+
+                // Format the date from ISO string (YYYY-MM-DD)
+                const date = new Date(lastDataPoint.date);
+                const currentDate = date.toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
 
                 // Update the ticker
                 document.getElementById("tickerPrice").textContent = `$${currentPrice.toFixed(2)}`;
                 document.getElementById("tickerDate").textContent = `as of ${currentDate}`;
 
-                // Optionally, you could also display when the cache was last updated
-                // const lastUpdateDate = new Date(lastUpdated).toLocaleDateString();
-                // document.getElementById("tickerDate").textContent = `as of ${currentDate} (updated ${lastUpdateDate})`;
             } catch (error) {
                 console.error("Failed to fetch egg prices for ticker:", error);
                 // Add fallback display for errors

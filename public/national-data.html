@@ -23,8 +23,6 @@
             --egg-brown: #d68c45;
             --dark-brown: #4b2e15;
             --light-gray: #f4f4f4;
-            --democrat-blue: rgba(32, 74, 135, 0.1);
-            --republican-red: rgba(164, 0, 0, 0.1);
         }
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2563739074608905" crossorigin="anonymous"></script>
@@ -136,6 +134,7 @@
 
 <body class="relative flex flex-col min-h-screen overflow-x-hidden text-gray-800 font-host bg-light-gray">
     <!-- Header -->
+    <!-- Header -->
     <header class="flex flex-row items-center justify-start px-8 pt-3 pb-4 bg-light-gray">
         <a href="/" class="flex items-center justify-between gap-2 pr-8 border-r cursor-pointer border-dark-brown">
             <svg class="size-8 hover-shake" xmlns="http://www.w3.org/2000/svg" id="ep-logo-svg" viewBox="0 0 256 256">
@@ -155,7 +154,8 @@
         <!-- Desktop Navigation -->
         <nav class="items-end justify-between hidden h-full gap-4 px-8 pt-1 lg:flex">
             <a href="/national-data" class="px-2 py-1 duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Nationwide Data</a>
-            <a href="" class="px-2 py-1 border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-dark-brown hover:text-egg-brown border-egg-brown">Coming soon: Regional Data</a>
+
+            <a href="/about" class="px-2 py-1 duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">About</a>
         </nav>
 
         <!-- Mobile Navigation -->
@@ -177,7 +177,8 @@
             <nav class="flex flex-col space-y-4">
                 <a href="/" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Home</a>
                 <a href="/national-data" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">Nationwide Data</a>
-                <a href="" class="p-4 text-4xl border-2 border-dotted rounded-md opacity-50 cursor-not-allowed text-dark-brown hover:text-egg-brown border-egg-brown">Coming soon: <br>Regional Data</a>
+
+                <a href="/about" class="p-4 text-4xl duration-300 border-2 border-transparent rounded-md text-dark-brown hover:text-egg-brown border-egg-white hover:border-egg-brown">About</a>
             </nav>
         </div>
     </header>
@@ -275,8 +276,9 @@
                                 <span>Updated every 12 hours</span>
                                 <span class="mx-2">•</span>
                                 <a href="https://www.bls.gov/data/" class="text-egg-brown hover:underline" target="_blank" rel="noopener">
-                                    Source: Bureau of Labor Statistics <span class="text-xs">(APU0000708111)</span>
+                                    Sources: Bureau of Labor Statistics <span class="text-xs">(APU0000708111)</span>
                                 </a>
+                                <span>and USDA with minimal processing by EggPrices.org</span>
                             </div>
                         </div>
                     </div>
@@ -458,11 +460,15 @@
                 } = result;
 
                 // Prepare data for the chart
-                const labels = data.map(item => item.periodName + ' ' + item.year);
+                const labels = data.map(item => {
+                    const date = new Date(item.date);
+                    return date.toLocaleDateString('en-US', {
+                        month: 'short',
+                        day: 'numeric',
+                        year: 'numeric'
+                    });
+                });
                 const prices = data.map(item => parseFloat(item.value));
-
-                labels.reverse();
-                prices.reverse();
 
                 // Destroy existing chart if it exists
                 if (currentChart) {
@@ -480,8 +486,8 @@
                             data: prices,
                             borderColor: "var(--egg-brown)",
                             backgroundColor: "rgba(214, 140, 69, 0.1)",
-                            borderWidth: 4,
-                            tension: 0.4,
+                            borderWidth: 3,
+                            tension: 0.1,
                             fill: true,
                             pointRadius: 0,
                             pointHoverRadius: 3,
@@ -507,7 +513,7 @@
                                 titleFont: {
                                     family: "'Host Grotesk', sans-serif",
                                     size: 16,
-                                    weight: 'bold',
+                                    weight: 'lighter',
                                 },
                                 titleColor: 'rgba(0, 0, 0, 0.9)',
                                 bodyFont: {
@@ -526,32 +532,6 @@
                                         return `$${context.raw.toFixed(2)} / dozen`; // Price formatted as currency
                                     }
                                 }
-                            },
-                            annotation: {
-                                annotations: {
-                                    presidentalTerms: [{
-                                        type: 'box',
-                                        xMin: '2014 Jan',
-                                        xMax: '2017 Jan',
-                                        backgroundColor: 'var(--democrat-blue)',
-                                        borderWidth: 0,
-                                        drawTime: 'beforeDatasetsDraw'
-                                    }, {
-                                        type: 'box',
-                                        xMin: '2017 Jan',
-                                        xMax: '2021 Jan',
-                                        backgroundColor: 'var(--republican-red)',
-                                        borderWidth: 0,
-                                        drawTime: 'beforeDatasetsDraw'
-                                    }, {
-                                        type: 'box',
-                                        xMin: '2021 Jan',
-                                        xMax: labels[labels.length - 1], // Current date
-                                        backgroundColor: 'var(--democrat-blue)',
-                                        borderWidth: 0,
-                                        drawTime: 'beforeDatasetsDraw'
-                                    }]
-                                }
                             }
                         },
                         scales: {
@@ -563,6 +543,14 @@
                                     font: {
                                         family: "'Host Grotesk', sans-serif",
                                         size: 12
+                                    },
+                                    callback: function(value, index) {
+                                        // value is already a date string in format YYYY-MM-DD
+                                        const date = new Date(labels[index]);
+                                        return date.toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            year: 'numeric'
+                                        });
                                     }
                                 }
                             },
@@ -586,22 +574,32 @@
 
                 console.log(data);
                 // Update insights with dates
-                const lastDataPoint = data[0];
-                const currentDate = `${lastDataPoint.periodName} ${lastDataPoint.year}`;
+                const lastDataPoint = data[data.length - 1];
+                const currentDate = new Date(lastDataPoint.date).toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
+
                 document.getElementById("currentPrice").textContent = `$${prices[prices.length - 1].toFixed(2)}`;
                 document.getElementById("currentDate").textContent = `as of ${currentDate}`;
-                document.getElementById("currentDateFAQ").textContent = `${currentDate}`;
+                document.getElementById("currentDateFAQ").textContent = currentDate;
                 document.getElementById("currentPriceFAQ").textContent = `$${prices[prices.length - 1].toFixed(2)}`;
 
                 const highestPrice = Math.max(...prices);
                 const highestIndex = prices.indexOf(highestPrice);
-                const highestDate = `${data[prices.length - 1 - highestIndex].periodName} ${data[prices.length - 1 - highestIndex].year}`;
+                const highestDate = new Date(data[highestIndex].date).toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
                 document.getElementById("highestPrice").textContent = `$${highestPrice.toFixed(2)}`;
                 document.getElementById("highestDate").textContent = `reached ${highestDate}`;
 
                 const lowestPrice = Math.min(...prices);
                 const lowestIndex = prices.indexOf(lowestPrice);
-                const lowestDate = `${data[prices.length - 1 - lowestIndex].periodName} ${data[prices.length - 1 - lowestIndex].year}`;
+                const lowestDate = new Date(data[lowestIndex].date).toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric'
+                });
                 document.getElementById("lowestPrice").textContent = `$${lowestPrice.toFixed(2)}`;
                 document.getElementById("lowestDate").textContent = `reached ${lowestDate}`;
 

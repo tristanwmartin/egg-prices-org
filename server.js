@@ -58,13 +58,28 @@ const generateSitemap = async() => {
 // Middleware to serve static files
 app.use(express.static("public"));
 
-// Function to fetch data from the BLS API
+// Function to convert month name and year to last day of month date
+function getLastDayOfMonth(year, monthName) {
+    const monthIndex = new Date(Date.parse(monthName + " 1, 2000")).getMonth();
+    return new Date(year, monthIndex + 1, 0).toISOString().split('T')[0];
+}
+
+// Function to transform BLS data format to desired format
+function transformBLSData(rawData) {
+    return rawData.map(item => ({
+        date: getLastDayOfMonth(item.year, item.periodName),
+        value: parseFloat(item.value)
+    }));
+}
+
+// Function to fetch only the most recent data from BLS API
 async function fetchEggPrices() {
     const apiUrl = "https://api.bls.gov/publicAPI/v1/timeseries/data/";
     const currentYear = new Date().getFullYear();
+    // Only fetch last 2 years of data to get recent updates
     const payload = {
         seriesid: ["APU0000708111"],
-        startyear: "2015",
+        startyear: (currentYear - 1).toString(),
         endyear: currentYear.toString(),
     };
 
@@ -76,12 +91,34 @@ async function fetchEggPrices() {
         });
 
         if (response.data.status === "REQUEST_SUCCEEDED") {
+            const newData = transformBLSData(response.data.Results.series[0].data);
+
+            // Read existing cache or create empty data
+            let existingData = { data: [], timestamp: Date.now() };
+            if (fs.existsSync(CACHE_FILE)) {
+                existingData = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
+            }
+
+            // Merge new data with existing data, avoiding duplicates
+            const mergedData = [...existingData.data];
+            newData.forEach(newItem => {
+                const existingIndex = mergedData.findIndex(item => item.date === newItem.date);
+                if (existingIndex === -1) {
+                    mergedData.push(newItem);
+                } else {
+                    mergedData[existingIndex] = newItem;
+                }
+            });
+
+            // Sort by date
+            mergedData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
             const data = {
-                data: response.data.Results.series[0].data,
+                data: mergedData,
                 timestamp: Date.now(),
             };
 
-            // Write data to the cache file
+            // Write updated data to cache file
             fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
             console.log("Cache updated and saved to file.");
             return data;
@@ -114,21 +151,20 @@ function getCachedData() {
     return null;
 }
 
-// Route to serve data
+// Updated route to always serve from cache
 app.get("/api/egg-prices", async(req, res) => {
     try {
         let data = getCachedData();
-        const months = parseInt(req.query.months) || 120; // Default to 10 years (120 months)
+        const months = parseInt(req.query.months) || 120; // Default to 10 years
 
         if (!data) {
-            // Fetch new data if no valid cache
             data = await fetchEggPrices();
         }
 
         // Filter data based on requested months
         const currentDate = new Date();
         const filteredData = data.data.filter(item => {
-            const itemDate = new Date(item.year, getMonthNumber(item.periodName) - 1);
+            const itemDate = new Date(item.date);
             const monthsDiff = (currentDate.getFullYear() - itemDate.getFullYear()) * 12 +
                 (currentDate.getMonth() - itemDate.getMonth());
             return monthsDiff <= months;
@@ -221,67 +257,99 @@ app.get('/api/news', async(req, res) => {
     }
 });
 
-// Schedule cache refresh every 12 hours
+// Function to fetch daily egg prices
+async function fetchDailyEggPrices() {
+    const DAILY_PRICE_URL = 'https://egg-prices-daily-9e97519ea502.herokuapp.com/scrape';
+
+    try {
+        const response = await axios.get(DAILY_PRICE_URL);
+        const { price, timestamp } = response.data;
+
+        // Convert timestamp to Date object and subtract 2 days
+        const dateObj = new Date(timestamp);
+        dateObj.setDate(dateObj.getDate() - 2);
+        const date = dateObj.toISOString().split('T')[0];
+
+        // Read existing cache
+        let existingData = { data: [], timestamp: Date.now() };
+        if (fs.existsSync(CACHE_FILE)) {
+            existingData = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
+        }
+
+        // Create new data point
+        const newDataPoint = {
+            date,
+            value: parseFloat(price)
+        };
+
+        // Merge with existing data, avoiding duplicates
+        const mergedData = [...existingData.data];
+        const existingIndex = mergedData.findIndex(item => item.date === date);
+        if (existingIndex === -1) {
+            mergedData.push(newDataPoint);
+        } else {
+            mergedData[existingIndex] = newDataPoint;
+        }
+
+        // Sort by date
+        mergedData.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+        const data = {
+            data: mergedData,
+            timestamp: Date.now(),
+        };
+
+        // Write updated data to cache file
+        fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
+        console.log("Daily price cache updated and saved to file.");
+        return data;
+    } catch (error) {
+        console.error("Error fetching daily egg prices:", error);
+        throw error;
+    }
+}
+
+// Update cron schedules
+// Run BLS data update every 12 hours
 cron.schedule("0 */12 * * *", async() => {
     try {
         await fetchEggPrices();
     } catch (error) {
-        console.error("Scheduled cache update failed:", error);
+        console.error("Scheduled BLS cache update failed:", error);
     }
 });
 
-// Helper function to convert month names to numbers
-function getMonthNumber(periodName) {
-    const months = {
-        'January': 1,
-        'February': 2,
-        'March': 3,
-        'April': 4,
-        'May': 5,
-        'June': 6,
-        'July': 7,
-        'August': 8,
-        'September': 9,
-        'October': 10,
-        'November': 11,
-        'December': 12
-    };
-    return months[periodName] || 1;
-}
-
-// Route to serve data
-app.get("/api/egg-prices", async(req, res) => {
+// Run daily price update at midnight every day
+cron.schedule("0 0 * * *", async() => {
     try {
-        let data = getCachedData();
-        const months = parseInt(req.query.months) || 120; // Default to 10 years (120 months)
+        await fetchDailyEggPrices();
+    } catch (error) {
+        console.error("Scheduled daily price update failed:", error);
+    }
+});
 
-        if (!data) {
-            // Only fetch new data if cache doesn't exist at all
-            data = await fetchEggPrices();
-        }
-        // Note: We're now using cached data even if expired, to reduce API calls
-
-        // Filter data based on requested months
-        const currentDate = new Date();
-        const filteredData = data.data.filter(item => {
-            const itemDate = new Date(item.year, getMonthNumber(item.periodName) - 1);
-            const monthsDiff = (currentDate.getFullYear() - itemDate.getFullYear()) * 12 +
-                (currentDate.getMonth() - itemDate.getMonth());
-            return monthsDiff <= months;
-        });
-
+// Add route to force daily price update
+app.post("/api/force-update-daily", async(req, res) => {
+    try {
+        const data = await fetchDailyEggPrices();
         res.json({
-            data: filteredData,
+            message: "Daily price cache updated successfully.",
+            data: data.data,
             lastUpdated: new Date(data.timestamp).toISOString(),
         });
     } catch (error) {
-        res.status(500).json({ error: "Failed to fetch data." });
+        res.status(500).json({ error: "Failed to update daily price cache." });
     }
 });
+
 
 // Add this new route
 app.get('/national-data', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'national-data.html'));
+});
+
+app.get('/about', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'about.html'));
 });
 
 
