@@ -9,8 +9,8 @@ module.exports = {
 
         extend: {
             fontFamily: {
-                'host': ['Host Grotesk', 'sans-serif'],
-                'teko': ['Teko', 'sans-serif'],
+                'host': ['Host Grotesk', 'Impact', 'sans-serif'],
+                'teko': ['Teko', 'Arial', 'sans-serif'],
             },
             colors: {
                 'egg-yellow': '#F2DA8A',
