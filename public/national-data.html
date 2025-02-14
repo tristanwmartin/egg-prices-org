@@ -8,7 +8,7 @@
         content="Stay updated on nationwide egg prices and trends. Our interactive chart and insights help you understand egg price fluctuations and make informed decisions.">
     <title>Nationwide Egg Prices - Stay Updated on Trends & Costs | EggPrices.org</title>
     <link rel="icon" href="favicon.ico" type="image/x-icon">
-    <link rel="stylesheet" href="style.css?v=1.0.1">
+    <link rel="stylesheet" href="style.css?v=1.0.2">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap"
@@ -31,6 +31,17 @@
     </style>
     <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2563739074608905"
         crossorigin="anonymous"></script>
+
+    <meta property="og:title" content="Current Egg Prices - $7.68 per dozen">
+    <meta property="og:description" content="Track nationwide egg prices and trends. Updated February 14, 2025.">
+    <meta property="og:image" content="https://eggprices.org/api/share-image">
+    <meta property="og:url" content="https://eggprices.org/national-data">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="Current Egg Prices - $7.68 per dozen">
+    <meta property="twitter:description" content="Track nationwide egg prices and trends. Updated February 14, 2025.">
+    <meta property="twitter:image" content="https://eggprices.org/api/share-image">
+    <meta property="twitter:image:alt"
+        content="Chart showing egg prices over time, currently at $7.68 per dozen as of February 14, 2025">
 </head>
 
 
@@ -305,7 +316,7 @@
         </p>
     </div>
     <!-- Main Content -->
-    <main class="flex flex-col items-center flex-grow w-full mt-4">
+    <main id="main-content" class="flex flex-col items-center flex-grow w-full mt-4">
         <!-- Interactive Chart Section -->
         <div class="flex flex-col w-full gap-8 shadow-lg lg:flex-row bg-light-gray zigzag-underline-light-gray">
             <section class="w-full px-8 lg:p-8 lg:pr-0 lg:w-3/5">
@@ -388,8 +399,9 @@
                 <div class="mx-4 mb-4">
                     <!-- Add share button -->
                     <button onclick="openShareDialog()"
-                    class="flex w-full justify-center lg:w-fit items-center gap-2 px-4 lg:py-1 py-6 duration-300 border rounded-md bg-egg-brown border-egg-brown hover:bg-egg-white text-egg-white hover:text-egg-brown focus:outline-none focus:ring-2 focus:ring-egg-brown">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        class="flex w-full justify-center lg:w-fit items-center gap-2 px-4 lg:py-1 py-6 duration-300 border rounded-md bg-egg-brown border-egg-brown hover:bg-egg-white text-egg-white hover:text-egg-brown focus:outline-none focus:ring-2 focus:ring-egg-brown">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none"
+                            stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                             <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
                             <polyline points="16 6 12 2 8 6"></polyline>
                             <line x1="12" y1="2" x2="12" y2="15"></line>
@@ -514,7 +526,7 @@
     </main>
 
     <!-- Footer -->
-    <footer class="py-4 mt-auto bg-egg-brown text-egg-white">
+    <footer class="py-4 mt-auto bg-egg-brown text-egg-white shadow-lg">
         <div class="max-w-6xl mx-auto text-center">
             <p>&copy; 2025 EggPrices.org. All rights reserved.</p>
         </div>
@@ -771,86 +783,142 @@
     </script>
 
     <!-- Add share dialog -->
-    <div id="shareDialog" class="fixed inset-0 z-50 hidden">
-        <div class="absolute inset-0 bg-black/50 shadow-lg" onclick="closeShareDialog()"></div>
-        <div
-            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-5xl p-6 bg-white rounded-lg shadow-xl">
-            <div class="flex items-center justify-between mb-6">
-                <h3 class="text-2xl font-bold text-dark-brown font-teko">Share Egg Price Data</h3>
-                <button onclick="closeShareDialog()" class="p-2 rounded-md hover:bg-egg-brown/10">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-
-            <div class="flex flex-col gap-6 md:flex-row">
-                <!-- Image Preview -->
-                <div class="w-full md:w-2/3">
-                    <img id="shareImage" alt="Egg Price Chart"
-                        class="w-full rounded-lg aspect-square shadow-md border border-egg-brown/25">
+    <div id="shareDialog" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="absolute inset-0 bg-black/50" onclick="closeShareDialog()"></div>
+        <div class="min-h-screen px-4 py-8 text-center sm:p-0">
+            <div
+                class="relative inline-block w-full max-w-5xl p-4 my-8 overflow-hidden text-left align-middle transition-all transform bg-white shadow-xl sm:p-6 rounded-lg">
+                <!-- Header -->
+                <div class="sticky top-0 z-10 flex items-center justify-between mb-4 bg-white border-b pb-4">
+                    <h3 class="text-2xl font-bold text-dark-brown font-teko">Share Egg Price Data</h3>
+                    <button onclick="closeShareDialog()"
+                        class="p-2 rounded-md hover:bg-egg-brown/10 focus:outline-none focus:ring-2 focus:ring-egg-brown">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
 
-                <!-- Share Options -->
-                <div class="w-full md:w-1/3 flex flex-col justify-start">
-                    <!-- Social Media Share Buttons -->
-                    <div class="space-y-3">
-                        <button onclick="nativeShare()"
-                            class="w-full px-4 py-3 font-semibold text-white duration-75 rounded-md bg-dark-brown hover:bg-[#2b1a0c] flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-                            </svg>
-                            Share
-                        </button>
-                        <button onclick="shareToTwitter()"
-                            class="w-full px-4 py-3 font-semibold text-white duration-75 rounded-md bg-[#1DA1F2] hover:bg-[#1a8cd8] flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
-                            </svg>
-                            Share on Twitter
-                        </button>
+                <!-- Content -->
+                <div class="flex flex-col lg:flex-row gap-6">
+                    <!-- Image Preview -->
+                    <div class="w-full lg:w-2/3">
+                        <img id="shareImage" alt="Egg Price Chart"
+                            class="w-full rounded-lg shadow-md border border-egg-brown/25 mb-6">
 
-                        <button onclick="shareToFacebook()"
-                            class="w-full px-4 py-3 font-semibold text-white duration-75 rounded-md bg-[#1877F2] hover:bg-[#166fe5] flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
-                            </svg>
-                            Share on Facebook
-                        </button>
-
-                        <button onclick="shareToLinkedIn()"
-                            class="w-full px-4 py-3 font-semibold text-white duration-75 rounded-md bg-[#0A66C2] hover:bg-[#094ea3] flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
-                            </svg>
-                            Share on LinkedIn
-                        </button>
+                        <!-- Add Embed Preview -->
+                        <div class="embed-preview-container mt-6">
+                            <h4 class="font-semibold text-dark-brown mb-2">Live Preview</h4>
+                            <div class="h-[305px] flex justify-center items-center relative">
+                                <iframe id="embedPreview"
+                                    class="w-full h-full"
+                                    style="border-radius: 8px;" title="US Egg Price Chart - EggPrices.org">
+                                </iframe>
+                            </div>
+                        </div>
                     </div>
 
-                    <!-- Download and Copy Link Buttons -->
-                    <div class="space-y-3 pt-6 border-t mt-6">
-                        <button onclick="downloadImage()"
-                            class="w-full px-4 py-3 font-semibold duration-75 border rounded-md bg-egg-white border-egg-brown text-dark-brown hover:bg-egg-brown hover:text-egg-white flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                            </svg>
-                            Download Image
-                        </button>
+                    <!-- Share Options -->
+                    <div class="w-full lg:w-1/3 flex flex-col justify-between">
+                        <!-- Social Media Share Buttons -->
+                        <div class="space-y-3">
+                            <button onclick="nativeShare()"
+                                class="w-full px-4 py-3 font-semibold text-white duration-300 rounded-md bg-dark-brown hover:bg-[#2b1a0c] flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+                                </svg>
+                                Share
+                            </button>
 
-                        <button onclick="copyLink()"
-                            class="w-full px-4 py-3 font-semibold duration-75 border rounded-md bg-egg-white border-egg-brown text-dark-brown hover:bg-egg-brown hover:text-egg-white flex items-center justify-center gap-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
-                            </svg>
-                            Copy Page URL
-                        </button>
+                            <button onclick="shareToTwitter()"
+                                class="w-full px-4 py-3 font-semibold text-white duration-300 rounded-md bg-[#1DA1F2] hover:bg-[#1a8cd8] flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z" />
+                                </svg>
+                                Share on Twitter
+                            </button>
+
+                            <button onclick="shareToFacebook()"
+                                class="w-full px-4 py-3 font-semibold text-white duration-300 rounded-md bg-[#1877F2] hover:bg-[#166fe5] flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z" />
+                                </svg>
+                                Share on Facebook
+                            </button>
+
+                            <button onclick="shareToLinkedIn()"
+                                class="w-full px-4 py-3 font-semibold text-white duration-300 rounded-md bg-[#0A66C2] hover:bg-[#094ea3] flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                                    <path
+                                        d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                                </svg>
+                                Share on LinkedIn
+                            </button>
+                        </div>
+
+
+
+                        <!-- Download and Copy Link Buttons -->
+                        <div class="space-y-3 pt-6 border-t mt-6">
+                            <button onclick="downloadImage()"
+                                class="w-full px-4 py-3 font-semibold duration-300 border rounded-md bg-egg-white border-egg-brown text-dark-brown hover:bg-egg-brown hover:text-egg-white flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                </svg>
+                                Download Image
+                            </button>
+
+                            <button onclick="copyLink()"
+                                class="w-full px-4 py-3 font-semibold duration-300 border rounded-md bg-egg-white border-egg-brown text-dark-brown hover:bg-egg-brown hover:text-egg-white flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                </svg>
+                                Copy Page URL
+                            </button>
+                        </div>
+
+                        <!-- Embed Section -->
+                        <div class="space-y-3 pt-6 border-t mt-6">
+                            <h4 class="font-semibold text-dark-brown">Embed on your website</h4>
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label for="embedMonths" class="block text-sm text-gray-600 mb-1">Months to Show</label>
+                                    <input type="number" id="embedMonths" name="embedMonths" 
+                                        min="1" max="120" value="60" step="1"
+                                        class="w-full px-3 py-2 bg-gray-50 border rounded-md border-egg-brown/25 focus:outline-none focus:ring-2 focus:ring-egg-brown"
+                                        onchange="updateEmbedCode()"
+                                        oninput="this.value = Math.min(Math.max(this.value, 1), 120)">
+                                </div>
+                                <div>
+                                    <label for="embedTheme" class="block text-sm text-gray-600 mb-1">Theme</label>
+                                    <select id="embedTheme" name="embedTheme" 
+                                        class="w-full px-3 py-2 bg-gray-50 border rounded-md border-egg-brown/25 focus:outline-none focus:ring-2 focus:ring-egg-brown"
+                                        onchange="updateEmbedCode()">
+                                        <option value="light" selected>Light</option>
+                                        <option value="dark">Dark</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="relative">
+                                <textarea id="embedCode" readonly rows="3" 
+                                    class="w-full px-3 py-2 text-sm font-mono bg-gray-50 border rounded-md border-egg-brown/25 focus:outline-none focus:ring-2 focus:ring-egg-brown"
+                                ></textarea>
+                                <button onclick="copyEmbedCode()" 
+                                    class="absolute top-2 right-2 p-2 text-dark-brown hover:text-egg-brown focus:outline-none"
+                                    title="Copy embed code">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                            d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -858,15 +926,50 @@
     </div>
 
     <script>
-        // Add these functions after your existing JavaScript
+        function getEmbedCode() {
+            const months = document.getElementById('embedMonths').value;
+            const theme = document.getElementById('embedTheme').value;
+            return `<iframe src="https://eggprices.org/embed?months=${months}&theme=${theme}" 
+        style="border: none; width: 602px; height: 302px; max-width: 100%;" 
+        title="US Egg Price Chart - EggPrices.org">
+    </iframe>
+`;
+        }
+
+        function updateEmbedCode() {
+            const embedCodeElement = document.getElementById('embedCode');
+            const embedPreview = document.getElementById('embedPreview');
+            const months = document.getElementById('embedMonths').value;
+            const theme = document.getElementById('embedTheme').value;
+            
+            // Update the textarea
+            embedCodeElement.value = getEmbedCode();
+            
+            // Update the preview
+            embedPreview.src = `${window.location.origin}/embed?months=${months}&theme=${theme}`;
+        }
+    </script>
+
+    <script>
+        const container = document.querySelector('#main-content');
+        container.addEventListener('touchstart', () => { });
+        container.addEventListener('touchend', () => { });
+        container.addEventListener('touchcancel', () => { });
+        container.addEventListener('touchmove', () => { });
+    </script>
+
+    <script>
         function openShareDialog() {
             const dialog = document.getElementById('shareDialog');
-            const shareImage = document.getElementById('shareImage');
             dialog.classList.remove('hidden');
             document.body.style.overflow = 'hidden';
 
-            // Load the share image
+            // Generate share image
+            const shareImage = document.getElementById('shareImage');
             shareImage.src = '/api/share-image?' + new Date().getTime();
+            
+            // Initialize embed code and preview
+            updateEmbedCode();
         }
 
         function closeShareDialog() {
@@ -875,91 +978,23 @@
             document.body.style.overflow = '';
         }
 
-        function downloadImage() {
-            const link = document.createElement('a');
-            link.href = document.getElementById('shareImage').src;
-            link.download = 'egg-prices.png';
-            link.click();
-        }
-
-        async function copyLink() {
-            try {
-                await navigator.clipboard.writeText(window.location.href);
-                alert('Link copied to clipboard!');
-            } catch (err) {
-                console.error('Failed to copy link:', err);
+        // Close dialog when clicking outside
+        document.addEventListener('click', (event) => {
+            const dialog = document.getElementById('shareDialog');
+            const dialogContent = dialog.querySelector('.dialog-content');
+            if (event.target === dialog) {
+                closeShareDialog();
             }
-        }
-
-        function shareToTwitter() {
-            const text = "Check out the latest egg prices in the US";
-            const url = window.location.href;
-            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
-        }
-
-        function shareToFacebook() {
-            const url = window.location.href;
-            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
-        }
-
-        function shareToLinkedIn() {
-            const url = window.location.href;
-            const title = "US Egg Prices - EggPrices.org";
-            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`, '_blank');
-        }
-
-        // Close dialog on escape key
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeShareDialog();
         });
 
-        async function nativeShare() {
-            if (!navigator.share) {
-                alert('Web Share API is not supported in your browser');
-                return;
+        // Close dialog with escape key
+        document.addEventListener('keydown', (event) => {
+            if (event.key === 'Escape') {
+                closeShareDialog();
             }
-
-            try {
-                // Get the share image
-                const img = document.getElementById('shareImage');
-                const imgResponse = await fetch(img.src);
-                const imgBlob = await imgResponse.blob();
-
-                // Create file with proper name and type
-                const file = new File(
-                    [imgBlob],
-                    'eggprices-chart.png',  // Changed from no name to specific name
-                    {
-                        type: imgBlob.type || 'image/png',
-                        lastModified: new Date().getTime()
-                    }
-                );
-
-                await navigator.share({
-                    title: 'US Egg Prices - EggPrices.org',
-                    text: 'Check out the latest egg prices in the US',
-                    url: window.location.href,
-                    files: [file]
-                });
-            } catch (err) {
-                if (err.name !== 'AbortError') {
-                    console.error('Error sharing:', err);
-                    // Fallback to basic share if file sharing fails
-                    try {
-                        await navigator.share({
-                            title: 'US Egg Prices - EggPrices.org',
-                            text: 'Check out the latest egg prices in the US',
-                            url: window.location.href
-                        });
-                    } catch (fallbackErr) {
-                        if (fallbackErr.name !== 'AbortError') {
-                            console.error('Error in fallback sharing:', fallbackErr);
-                        }
-                    }
-                }
-            }
-        }
+        });
     </script>
+
 </body>
 
 </html>

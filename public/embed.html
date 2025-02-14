@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <meta name="googlebot" content="noindex, nofollow">
+    <title>US Egg Price Chart - EggPrices.org</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Host+Grotesk:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Teko:wght@300..700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-annotation"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-date-fns/dist/chartjs-adapter-date-fns.bundle.min.js"></script>
+    <style>
+        :root {
+            --egg-brown: #d68c45;
+            --dark-brown: #4b2e15;
+            --egg-yellow: #F2DA8A;
+            --egg-white: #f5f0e6;
+            --bg-color: #ffffff;
+            --text-primary: #4b2e15;
+            --text-secondary: rgba(75, 46, 21, 0.8);
+            --border-color: #d68c45;
+            --stats-bg: #f5f0e6;
+            --link-bg: rgba(255, 255, 255, 0.9);
+            --grid-color: rgba(75, 46, 21, 0.1);
+            --tooltip-bg: rgba(244, 244, 244, 0.9);
+            --tooltip-text: rgba(0, 0, 0, 0.9);
+            --font-primary: "Host Grotesk", system-ui, -apple-system, sans-serif;
+            --font-display: "Teko", system-ui, -apple-system, sans-serif;
+        }
+
+        .theme-dark {
+            --bg-color: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255, 255, 255, 0.8);
+            --stats-bg: rgba(26, 26, 26, 0.95);
+            --link-bg: rgba(26, 26, 26, 0.9);
+            --grid-color: rgba(255, 255, 255, 0.1);
+            --tooltip-bg: rgba(26, 26, 26, 0.9);
+            --tooltip-text: rgba(255, 255, 255, 0.9);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            height: 300px;
+            width: 600px;
+            max-width: 100%;
+            font-family: var(--font-primary);
+            color: var(--text-primary);
+            transition: background-color 0.3s ease;
+        }
+
+        .title-area {
+            padding: 12px 16px 0 16px;
+            display: flex;
+            justify-content: start;
+            align-items: center;
+        }
+
+        .title {
+            font-family: var(--font-display);
+            font-size: 24px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin: 0;
+            letter-spacing: 0.02em;
+        }
+
+        .subtitle {
+            font-family: var(--font-primary);
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin: 2px 0 0 0;
+        }
+
+        .chart-container {
+            flex: 1;
+            padding: 8px 16px 0 16px;
+            min-height: 0;
+        }
+
+        .stats-footer {
+            border-radius: 0 0 8px 8px;
+            background: var(--stats-bg);
+            border-top: 1px solid var(--border-color);
+            transition: background-color 0.3s ease;
+        }
+
+        .stats-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stats-group {
+            padding-inline:16px;
+            display: flex;
+            gap: 16px;
+        }
+
+        .stat {
+            border-right: 1px solid var(--border-color);
+            padding-top:8px;
+            padding-bottom: 6px;
+            padding-right: 16px;
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .stat-value {
+            font-family: var(--font-display);
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--egg-brown);
+            letter-spacing: 0.02em;
+        }
+
+        .site-link {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            margin-right: 16px;
+            background: var(--link-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            color: var(--text-primary);
+            text-decoration: none;
+            font-family: var(--font-primary);
+            font-size: 12px;
+            transition: all 0.2s ease;
+        }
+
+        .current-date {
+            font-family: var(--font-primary);
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-left: 8px;
+        }
+
+        .site-link-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .site-link:hover {
+            background: var(--egg-brown);
+            color: white;
+        }
+
+        .theme-dark .site-link:hover {
+            background: color-mix(in srgb, var(--egg-brown) 50%, black);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div style="display: flex; flex-direction: column; height: 100%; width: 100%; background-color: var(--bg-color); border-radius: 8px; border: 1px solid var(--border-color);">
+        <div class="title-area">
+            <div>
+                <h1 class="title">US Egg Prices <span id="currentDate" class="current-date"></span></h1>
+                <p class="subtitle">Average price per dozen, Grade A, Large</p>
+            </div>
+            
+        </div>
+        <div class="chart-container">
+            <canvas id="eggPriceChart"></canvas>
+        </div>
+        <div class="stats-footer">
+            <div class="stats-content">
+                <div class="stats-group">
+                    <div class="stat">
+                        <span class="stat-label">Current:</span>
+                        <span id="currentPrice" class="stat-value">--</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Avg:</span>
+                        <span id="averagePrice" class="stat-value">--</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Low:</span>
+                        <span id="lowestPrice" class="stat-value">--</span>
+                    </div>
+                </div>
+                <div class="site-link-container">
+                    <!-- data source -->
+                     <span>BLS and USDA via</span>
+                    <a href="https://eggprices.org/national-data?utm_source=embed&utm_medium=embed&utm_campaign=embed" target="_blank" class="site-link">
+                        <svg viewBox="0 0 256 256" style="width: 12px; height: 12px;">
+                        <path fill="#d68c45" d="M76.26,117.57c1.37-1.37,3.24-2.15,5.18-2.15s3.81.77,5.18,2.15l31.74,31.74,53.83-53.83c2.86-2.86,7.5-2.86,10.36,0l35.25,35.25c8.02-40.85,5.32-87.43-25.25-108.31l-4.33-2.31C134.94-.84,68.46,65.8,46.93,109.79c-7.87,15.52-12.83,32.76-12.6,49.71l41.93-41.93Z"/>
+                        <path fill="#4b2e15" d="M177.38,111.03l-53.83,53.83c-2.86,2.86-7.5,2.86-10.36,0l-31.74-31.74-43.53,43.53c-.37.37-.77.69-1.2.96,1.9,7.3,4.98,14.4,9.46,21.13,15.81,23.97,48.48,41.39,77.21,41.13,32.74-.17,58.06-22.82,73.32-50.13l4.07-7.62c4.87-9.55,9.45-21.5,13.08-34.61l-36.47-36.47Z"/>
+                    </svg>
+                        EggPrices.org
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        async function initChart() {
+            try {
+                // Get URL parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const months = urlParams.get('months') || '60';
+                const theme = urlParams.get('theme') || 'light';
+                
+                // Apply theme
+                if (theme === 'dark') {
+                    document.body.classList.add('theme-dark');
+                }
+                
+                // Fetch data
+                const response = await fetch(`/api/egg-prices?months=${months}`);
+                const result = await response.json();
+                const { data } = result;
+
+                // Calculate statistics
+                const prices = data.map(item => parseFloat(item.value));
+                const currentPrice = prices[prices.length - 1];
+                const averagePrice = prices.reduce((a, b) => a + b, 0) / prices.length;
+                const lowestPrice = Math.min(...prices);
+
+                // Update statistics
+                document.getElementById('currentPrice').textContent = `$${currentPrice.toFixed(2)}`;
+                document.getElementById('averagePrice').textContent = `$${averagePrice.toFixed(2)}`;
+                document.getElementById('lowestPrice').textContent = `$${lowestPrice.toFixed(2)}`;
+
+                // Create chart
+                const ctx = document.getElementById('eggPriceChart').getContext('2d');
+                const chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        datasets: [{
+                            label: 'Egg Prices',
+                            data: data.map(item => ({
+                                x: new Date(item.date),
+                                y: parseFloat(item.value)
+                            })),
+                            borderColor: '#d68c45',
+                            backgroundColor: 'rgba(214, 140, 69, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.1,
+                            fill: true,
+                            pointRadius: 0,
+                            pointHoverRadius: 3,
+                            pointHoverBackgroundColor: '#F2DA8A',
+                            pointHoverBorderColor: '#4b2e15',
+                            pointHoverBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        height: 200,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false, // This enables hover anywhere on the x-axis
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }, // Remove legend since we only have one dataset
+                            tooltip: {
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleFont: {
+                                    family: "'Host Grotesk', sans-serif",
+                                    size: 16,
+                                    weight: 'lighter',
+                                },
+                                titleColor: 'rgba(0, 0, 0, 0.9)',
+                                bodyFont: {
+                                    family: "'Host Grotesk', sans-serif",
+                                    size: 20,
+                                    weight: 'bold',
+                                },
+                                bodyColor: 'var(--egg-yellow)',
+                                padding: 12,
+                                displayColors: false, // removes the color box in tooltip
+                                callbacks: {
+                                    title: function (context) {
+                                        // Format the actual date from the data point
+                                        return new Date(context[0].raw.x).toLocaleDateString('en-US', {
+                                            month: 'short',
+                                            day: 'numeric',
+                                            year: 'numeric'
+                                        });
+                                    },
+                                    label: function (context) {
+                                        return `$${context.raw.y.toFixed(2)} / dozen`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                type: 'time',
+                                time: {
+                                    unit: 'month',
+                                    displayFormats: {
+                                        month: 'MMM yyyy'
+                                    }
+                                },
+                                min: new Date(data[0].date), // Set minimum date to first data point
+                                max: new Date(data[data.length - 1].date), // Set maximum date to last data point
+                                grid: {
+                                    display: false
+                                },
+                                ticks: {
+                                    font: {
+                                        family: "'Host Grotesk', sans-serif",
+                                        size: 12
+                                    },
+                                    maxRotation: 0,
+                                    autoSkip: true,
+                                    maxTicksLimit: 12
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(75, 46, 21, 0.1)', // subtle horizontal grid lines
+                                },
+                                ticks: {
+                                    font: {
+                                        family: "'Host Grotesk', sans-serif",
+                                        size: 12
+                                    },
+                                    callback: function (value) {
+                                        return '$' + value.toFixed(2); // Format y-axis labels as currency
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Update to include current date in title area
+                const currentDate = new Date(data[data.length - 1].date).toLocaleDateString('en-US', {
+                    month: 'long',
+                    year: 'numeric',
+                    day: 'numeric'
+                });
+                document.getElementById('currentDate').textContent = `as of ${currentDate}`;
+
+            } catch (error) {
+                console.error("Failed to fetch egg prices:", error);
+            }
+        }
+
+        window.onload = initChart;
+    </script>
+</body>
+</html>

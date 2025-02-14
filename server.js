@@ -11,6 +11,8 @@ const { SitemapStream, streamToPromise } = require('sitemap');
 const { Readable } = require('stream');
 const { createCanvas, registerFont, loadImage } = require('canvas');
 const fsPromises = require('fs').promises;
+const cors = require('cors');
+const rateLimit = require('express-rate-limit');
 
 const app = express();
 const PORT = 3000;
@@ -20,6 +22,39 @@ const CACHE_FILE = path.join(__dirname, "cache.json");
 
 // Cache validity duration in milliseconds (12 hours)
 const CACHE_DURATION = 12 * 60 * 60 * 1000;
+
+// Add these constants at the top with other constants
+const SHARE_IMAGE_CACHE_PATH = path.join(__dirname, 'public', 'cache', 'share-image.png');
+const SHARE_IMAGE_CACHE_DURATION = 900 * 1000; // 15 minutes in milliseconds
+
+// Create cache directory if it doesn't exist
+if (!fs.existsSync(path.join(__dirname, 'public', 'cache'))) {
+    fs.mkdirSync(path.join(__dirname, 'public', 'cache'), { recursive: true });
+}
+
+// Function to check if cached image is valid
+function isShareImageCacheValid() {
+    try {
+        const stats = fs.statSync(SHARE_IMAGE_CACHE_PATH);
+        const age = Date.now() - stats.mtime.getTime();
+        return age < SHARE_IMAGE_CACHE_DURATION;
+    } catch (error) {
+        return false;
+    }
+}
+
+// Function to generate and cache share image
+async function updateShareImageCache() {
+    try {
+        const cachedData = getCachedData();
+        const imageBuffer = await generateShareImage(cachedData);
+        await fsPromises.writeFile(SHARE_IMAGE_CACHE_PATH, imageBuffer);
+        console.log('Share image cache updated successfully');
+    } catch (error) {
+        console.error('Error updating share image cache:', error);
+        throw error;
+    }
+}
 
 // Example: Replace with your actual data source for URLs
 const fetchURLs = async() => {
@@ -60,6 +95,43 @@ const generateSitemap = async() => {
 // Middleware to serve static files
 app.use(express.static("public"));
 
+// CORS configuration
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    // Add your allowed domains here
+    const allowedDomains = [
+      'https://eggprices.org',
+      'http://localhost:3000', // for development
+    ];
+    
+    if (allowedDomains.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  methods: ['GET'],
+  optionsSuccessStatus: 200
+};
+
+// Apply CORS to the egg prices API endpoint
+app.use('/api/egg-prices', cors(corsOptions));
+
+// Rate limiting configuration
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true,
+  legacyHeaders: false,
+});
+
+// Apply rate limiting to the API endpoint
+app.use('/api/egg-prices', apiLimiter);
+
 // Function to convert month name and year to last day of month date
 function getLastDayOfMonth(year, monthName) {
     const monthIndex = new Date(Date.parse(monthName + " 1, 2000")).getMonth();
@@ -98,15 +170,15 @@ try {
 console.log('Font path:', path.join(__dirname, 'public/fonts/HostGrotesk-Bold.ttf'));
 
 async function generateShareImage(data) {
-    const canvas = createCanvas(1200, 1200);
+    const canvas = createCanvas(1040, 544); // Updated dimensions
     const ctx = canvas.getContext('2d');
 
-    // Constants for layout - adjusted margins
-    const PADDING = 60;
-    const HEADER_HEIGHT = 140;
-    const FOOTER_HEIGHT = 60;
-    const CHART_MARGIN_Y = 100; // New constant for vertical chart margins
-    const CONTENT_HEIGHT = canvas.height - HEADER_HEIGHT - FOOTER_HEIGHT - (CHART_MARGIN_Y * 2); // Adjusted for margins
+    // Constants for layout - adjusted for new aspect ratio
+    const PADDING = 40; // Reduced padding
+    const HEADER_HEIGHT = 80; // Reduced header height
+    const FOOTER_HEIGHT = 40; // Reduced footer height
+    const CHART_MARGIN_Y = 60; // Reduced chart margin
+    const CONTENT_HEIGHT = canvas.height - HEADER_HEIGHT - FOOTER_HEIGHT - (CHART_MARGIN_Y * 2);
     
     // Set background
     ctx.fillStyle = '#ffffff';
@@ -125,19 +197,19 @@ async function generateShareImage(data) {
     
     // Draw logo in header (smaller)
     const logo = await loadImage(path.join(__dirname, 'public/img/ep-logo-color.png'));
-    ctx.drawImage(logo, PADDING, (HEADER_HEIGHT - 60) / 2, 60, 60);  // Reduced size
+    ctx.drawImage(logo, PADDING, (HEADER_HEIGHT - 40) / 2, 40, 40); // Smaller logo
     
     // Add EggPrices.org text next to logo
-    ctx.font = '42px "Host Grotesk Bold"';  // Reduced font size
+    ctx.font = '32px "Host Grotesk Bold"'; // Smaller font
     ctx.fillStyle = '#4b2e15';
     ctx.textAlign = 'left';
-    ctx.fillText('EggPrices.org', PADDING + 80, HEADER_HEIGHT/2 + 14);
+    ctx.fillText('EggPrices.org', PADDING + 55, HEADER_HEIGHT/2 + 10);
     
     // Add "Nationwide Data" text on right
-    ctx.font = '32px "Host Grotesk Bold"';
+    ctx.font = '24px "Host Grotesk Bold"'; // Smaller font
     ctx.fillStyle = '#666666';
     ctx.textAlign = 'right';
-    ctx.fillText('Nationwide Data', canvas.width - PADDING, HEADER_HEIGHT/2 + 10);
+    ctx.fillText('Nationwide Data', canvas.width - PADDING, HEADER_HEIGHT/2 + 8);
     
     // Draw grid lines and axis labels - adjusted y-positions
     const prices = data.data.slice(-60);
@@ -265,17 +337,27 @@ async function generateShareImage(data) {
     
     // Draw annotation for current price
     const currentPrice = prices[prices.length - 1].value;
-    // Position annotation in center of chart horizontally
-    const annotationX = (canvas.width / 2) - 150;  // Centered, accounting for width
-    const annotationHeight = 225;
-    const annotationY = lastPoint.y - annotationHeight/2;   // Position centered on last point
+    
+    // Calculate text dimensions
+    ctx.font = '20px "Host Grotesk Bold"';
+    const titleHeight = 30;
+    ctx.font = '90px "Teko Bold"';
+    const priceHeight = 75;
+    ctx.font = '20px "Host Grotesk Bold"';
+    const subtitleHeight = 35;
+    
+    // Calculate box dimensions
+    const annotationWidth = 265;
+    const annotationHeight = titleHeight + priceHeight + subtitleHeight + 20; // Add padding
+    const annotationX = (canvas.width / 1.75) - (annotationWidth/2);
+    const annotationY = lastPoint.y - (annotationHeight/2);
     
     // Draw annotation background
     ctx.fillStyle = '#ffffff';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.33)';
     ctx.shadowBlur = 10;
     ctx.shadowOffsetY = 2;
-    roundRect(ctx, annotationX, annotationY, 325, annotationHeight, 10);  // Increased size
+    roundRect(ctx, annotationX, annotationY, annotationWidth, annotationHeight, 10);
     ctx.fill();
     ctx.shadowColor = 'transparent';
     
@@ -284,26 +366,26 @@ async function generateShareImage(data) {
     ctx.setLineDash([5, 5]);
     ctx.strokeStyle = '#666666';
     ctx.lineWidth = 2;
-    ctx.moveTo(annotationX + 325, lastPoint.y);  // Start from right edge of annotation at price level
+    ctx.moveTo(annotationX + annotationWidth, lastPoint.y);  // Start from right edge of annotation
     ctx.lineTo(lastPoint.x, lastPoint.y);  // Draw straight to price point
     ctx.stroke();
     ctx.setLineDash([]);
     
     // Add annotation text (larger)
     ctx.textAlign = 'left';
-    ctx.font = '24px "Host Grotesk Bold"';  // Increased font size
+    ctx.font = '20px "Host Grotesk Bold"';
     ctx.fillStyle = '#4b2e15';
-    ctx.fillText('Current National Average', annotationX + 25, annotationY + 35);
+    ctx.fillText('Current National Average', annotationX + 20, annotationY + 30);
     
-    ctx.font = '128px "Teko Bold"';  // Increased font size
+    ctx.font = '90px "Teko Bold"'; // Reduced font size
     ctx.fillStyle = '#d68c45';
-    ctx.fillText(`$${currentPrice.toFixed(2)}`, annotationX + 25, annotationY + 150);
+    ctx.fillText(`$${currentPrice.toFixed(2)}`, annotationX + 35, annotationY + 110);
 
     // Add per dozen text
-    ctx.font = '24px "Host Grotesk Bold"';
+    ctx.font = '20px "Host Grotesk Bold"';
     ctx.fillStyle = '#4b2e15';
     // center text
-    ctx.fillText('per dozen eggs', annotationX + 75, annotationY + 195);
+    ctx.fillText('per dozen eggs', annotationX + 60, annotationY + 140);
     
     // Add footer with date
     const currentDate = new Date().toLocaleDateString('en-US', {
@@ -314,7 +396,7 @@ async function generateShareImage(data) {
     
     // Draw date pill
     const dateText = `As of ${currentDate}`;
-    ctx.font = '26px "Host Grotesk Bold"';
+    ctx.font = '18px "Host Grotesk Bold"';
     const dateWidth = ctx.measureText(dateText).width + 50;
     
     // Draw pill background
@@ -326,12 +408,12 @@ async function generateShareImage(data) {
     // Add date text
     ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.fillText(dateText, pillX + dateWidth/2, pillY + 37);
+    ctx.fillText(dateText, pillX + dateWidth/2, pillY + 25);
 
     // add source text left aligned to canvas with padding  
-    ctx.font = '16px "Host Grotesk Bold"';
+    ctx.font = '14px "Host Grotesk Bold"';
     ctx.fillStyle = '#666666';
-    ctx.fillText('Source: BLS and USDA via EggPrices.org', PADDING + canvas.width/2, canvas.height - FOOTER_HEIGHT/2 + 5);
+    ctx.fillText('Source: BLS and USDA via EggPrices.org', PADDING + 75 + canvas.width/2, canvas.height - FOOTER_HEIGHT/2 + 5);
 
     // After drawing the price line, add the endpoint circle
     const endpointRadius = 8;
@@ -363,47 +445,61 @@ function roundRect(ctx, x, y, width, height, radius) {
     ctx.closePath();
 }
 
-// Add route to serve the share image
+// Modify the share image route to use cache
 app.get('/api/share-image', async (req, res) => {
     try {
-        const cachedData = getCachedData();
-        const imageBuffer = await generateShareImage(cachedData);
+        // Check if we need to generate a new image
+        if (!isShareImageCacheValid()) {
+            await updateShareImageCache();
+        }
         
+        // Stream the cached image
         res.setHeader('Content-Type', 'image/png');
-        res.setHeader('Cache-Control', 'public, max-age=21600'); // 6 hours
-        res.send(imageBuffer);
+        res.setHeader('Cache-Control', 'public, max-age=900'); // 15 minutes
+        res.sendFile(SHARE_IMAGE_CACHE_PATH);
     } catch (error) {
-        console.error('Error generating share image:', error);
+        console.error('Error serving share image:', error);
         res.status(500).send('Error generating image');
     }
 });
 
-// Update meta tags when cache is updated
+// Add this function after your other utility functions
 async function updateMetaTags() {
     try {
         const cachedData = getCachedData();
         const currentPrice = cachedData.data[cachedData.data.length - 1].value;
         const currentDate = new Date().toLocaleDateString('en-US', {
             month: 'long',
-            year: 'numeric'
+            year: 'numeric',
+            day: 'numeric'
         });
-
-        const metaHtml = `
-            <meta property="og:title" content="Current Egg Prices - $${currentPrice.toFixed(2)} per dozen">
-            <meta property="og:description" content="Track nationwide egg prices and trends. Updated ${currentDate}.">
-            <meta property="og:image" content="https://eggprices.org/api/share-image">
-            <meta property="og:url" content="https://eggprices.org/national-data">
-            <meta name="twitter:card" content="summary_large_image">
-        `;
 
         const htmlPath = path.join(__dirname, 'public', 'national-data.html');
         let html = await fsPromises.readFile(htmlPath, 'utf8');
         
-        // Replace existing meta tags or add new ones
-        html = html.replace(
-            /<meta property="og:.*?>/g,
-            metaHtml
-        );
+        // Define the meta tag updates
+        const metaUpdates = {
+            'og:title': `Current Egg Prices - $${currentPrice.toFixed(2)} per dozen`,
+            'og:description': `Track nationwide egg prices and trends. Updated ${currentDate}.`,
+            'og:image': 'https://eggprices.org/api/share-image',
+            'og:url': 'https://eggprices.org/national-data',
+            'twitter:card': 'summary_large_image',
+            'twitter:title': `Current Egg Prices - $${currentPrice.toFixed(2)} per dozen`,
+            'twitter:description': `Track nationwide egg prices and trends. Updated ${currentDate}.`,
+            'twitter:image': 'https://eggprices.org/api/share-image',
+            'twitter:image:alt': `Chart showing egg prices over time, currently at $${currentPrice.toFixed(2)} per dozen as of ${currentDate}`
+        };
+
+        // Update each meta tag
+        for (const [key, value] of Object.entries(metaUpdates)) {
+            const metaRegex = new RegExp(`<meta\\s+property=["']${key}["']\\s+content=["'][^"']*["']\\s*>`, 'i');
+            const newMeta = `<meta property="${key}" content="${value}">`;
+            
+            if (metaRegex.test(html)) {
+                // Replace existing meta tag
+                html = html.replace(metaRegex, newMeta);
+            }
+        }
 
         await fsPromises.writeFile(htmlPath, html);
         console.log('Meta tags updated successfully');
@@ -412,7 +508,7 @@ async function updateMetaTags() {
     }
 }
 
-// Function to fetch only the most recent data from BLS API
+// Call updateMetaTags after updating the cache
 async function fetchEggPrices() {
     const apiUrl = "https://api.bls.gov/publicAPI/v1/timeseries/data/";
     const currentYear = new Date().getFullYear();
@@ -462,7 +558,7 @@ async function fetchEggPrices() {
             fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
             console.log("Cache updated and saved to file.");
 
-            // After updating cache, also update meta tags
+            // Add this line to update meta tags
             await updateMetaTags();
             
             return data;
@@ -523,10 +619,21 @@ app.get("/api/egg-prices", async(req, res) => {
     }
 });
 
-// Route to force cache update
+// Add share image update to the daily cron job
+cron.schedule("0 0 * * *", async() => {
+    try {
+        await fetchDailyEggPrices();
+        await updateShareImageCache(); // Add this line to update share image
+    } catch (error) {
+        console.error("Scheduled daily update failed:", error);
+    }
+});
+
+// Add share image update to the force update route
 app.post("/api/force-update", async(req, res) => {
     try {
-        const data = await fetchEggPrices(); // Fetch new data and update cache
+        const data = await fetchEggPrices();
+        await updateShareImageCache(); // Add this line to update share image
         res.json({
             message: "Cache updated successfully.",
             data: data.data,
@@ -653,51 +760,26 @@ async function fetchDailyEggPrices() {
     }
 }
 
-// Update cron schedules
-// Run BLS data update every 12 hours
-// cron.schedule("0 */12 * * *", async() => {
-//     try {
-//         await fetchEggPrices();
-//     } catch (error) {
-//         console.error("Scheduled BLS cache update failed:", error);
-//     }
-// });
-
-// Run daily price update at midnight every day
-cron.schedule("0 0 * * *", async() => {
-    try {
-        await fetchDailyEggPrices();
-    } catch (error) {
-        console.error("Scheduled daily price update failed:", error);
-    }
+// Add these routes before the API routes
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Add route to force daily price update
-app.post("/api/force-update-daily", async(req, res) => {
-    try {
-        const data = await fetchDailyEggPrices();
-        res.json({
-            message: "Daily price cache updated successfully.",
-            data: data.data,
-            lastUpdated: new Date(data.timestamp).toISOString(),
-        });
-    } catch (error) {
-        res.status(500).json({ error: "Failed to update daily price cache." });
-    }
-});
-
-
-// Add this new route
 app.get('/national-data', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'national-data.html'));
 });
 
+// Add any other page routes you need following the same pattern
 app.get('/about', (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'about.html'));
 });
 
-
-
+// Embed route
+app.get('/embed', (req, res) => {
+  // Set CORS headers for embedding
+  res.header('X-Frame-Options', 'ALLOW-FROM *');
+  res.sendFile(path.join(__dirname, 'public', 'embed.html'));
+});
 
 // Start the server
 app.listen(PORT, () => {
