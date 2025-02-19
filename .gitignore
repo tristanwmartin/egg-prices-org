@@ -1,5 +1,9 @@
-node_modules/
 .env
+
+node_modules/
 cache.json
 rss_cache.json
 public/cache
+
+
+*.log

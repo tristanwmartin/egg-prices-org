@@ -14,18 +14,19 @@ const fsPromises = require('fs').promises;
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 
+// Add dotenv configuration at the top of the file
+require('dotenv').config();
+
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
+const CACHE_DURATION = process.env.CACHE_DURATION || 12 * 60 * 60 * 1000;
+const SHARE_IMAGE_CACHE_DURATION = process.env.SHARE_IMAGE_CACHE_DURATION || 900 * 1000;
 
 // File to store cached data
 const CACHE_FILE = path.join(__dirname, "cache.json");
 
-// Cache validity duration in milliseconds (12 hours)
-const CACHE_DURATION = 12 * 60 * 60 * 1000;
-
 // Add these constants at the top with other constants
 const SHARE_IMAGE_CACHE_PATH = path.join(__dirname, 'public', 'cache', 'share-image.png');
-const SHARE_IMAGE_CACHE_DURATION = 900 * 1000; // 15 minutes in milliseconds
 
 // Create cache directory if it doesn't exist
 if (!fs.existsSync(path.join(__dirname, 'public', 'cache'))) {
@@ -66,7 +67,7 @@ const fetchURLs = async() => {
 
 const generateSitemap = async() => {
     try {
-        const baseUrl = 'https://eggprices.org'; // Replace with your site's URL
+        const baseUrl = process.env.BASE_URL;
         const urls = await fetchURLs();
 
         const sitemap = new SitemapStream({ hostname: baseUrl });
@@ -95,17 +96,12 @@ const generateSitemap = async() => {
 // Middleware to serve static files
 app.use(express.static("public"));
 
-// CORS configuration
+// Update CORS configuration
 const corsOptions = {
   origin: function (origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
     if (!origin) return callback(null, true);
     
-    // Add your allowed domains here
-    const allowedDomains = [
-      'https://eggprices.org',
-      'http://localhost:3000', // for development
-    ];
+    const allowedDomains = process.env.ALLOWED_DOMAINS.split(',');
     
     if (allowedDomains.indexOf(origin) !== -1) {
       callback(null, true);
@@ -120,10 +116,10 @@ const corsOptions = {
 // Apply CORS to the egg prices API endpoint
 app.use('/api/egg-prices', cors(corsOptions));
 
-// Rate limiting configuration
+// Update rate limiting configuration
 const apiLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  windowMs: process.env.RATE_LIMIT_WINDOW || 15 * 60 * 1000,
+  max: process.env.RATE_LIMIT_MAX || 100,
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false,
@@ -508,70 +504,6 @@ async function updateMetaTags() {
     }
 }
 
-// Call updateMetaTags after updating the cache
-async function fetchEggPrices() {
-    const apiUrl = "https://api.bls.gov/publicAPI/v1/timeseries/data/";
-    const currentYear = new Date().getFullYear();
-    // Only fetch last 2 years of data to get recent updates
-    const payload = {
-        seriesid: ["APU0000708111"],
-        startyear: (currentYear - 1).toString(),
-        endyear: currentYear.toString(),
-    };
-
-    try {
-        const response = await axios.post(apiUrl, payload, {
-            headers: {
-                "Content-Type": "application/json",
-            },
-        });
-
-        if (response.data.status === "REQUEST_SUCCEEDED") {
-            const newData = transformBLSData(response.data.Results.series[0].data);
-
-            // Read existing cache or create empty data
-            let existingData = { data: [], timestamp: Date.now() };
-            if (fs.existsSync(CACHE_FILE)) {
-                existingData = JSON.parse(fs.readFileSync(CACHE_FILE, "utf-8"));
-            }
-
-            // Merge new data with existing data, avoiding duplicates
-            const mergedData = [...existingData.data];
-            newData.forEach(newItem => {
-                const existingIndex = mergedData.findIndex(item => item.date === newItem.date);
-                if (existingIndex === -1) {
-                    mergedData.push(newItem);
-                } else {
-                    mergedData[existingIndex] = newItem;
-                }
-            });
-
-            // Sort by date
-            mergedData.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-            const data = {
-                data: mergedData,
-                timestamp: Date.now(),
-            };
-
-            // Write updated data to cache file
-            fs.writeFileSync(CACHE_FILE, JSON.stringify(data, null, 2));
-            console.log("Cache updated and saved to file.");
-
-            // Add this line to update meta tags
-            await updateMetaTags();
-            
-            return data;
-        } else {
-            console.error("API request failed:", response.data.message);
-            throw new Error("Failed to fetch data from API");
-        }
-    } catch (error) {
-        console.error("Error fetching data from BLS API:", error);
-        throw error;
-    }
-}
-
 // Function to get cached data (reads from file)
 function getCachedData() {
     if (fs.existsSync(CACHE_FILE)) {
@@ -624,6 +556,7 @@ cron.schedule("0 0 * * *", async() => {
     try {
         await fetchDailyEggPrices();
         await updateShareImageCache(); // Add this line to update share image
+        await updateMetaTags();
     } catch (error) {
         console.error("Scheduled daily update failed:", error);
     }
@@ -634,6 +567,7 @@ app.post("/api/force-update", async(req, res) => {
     try {
         const data = await fetchEggPrices();
         await updateShareImageCache(); // Add this line to update share image
+        await updateMetaTags();
         res.json({
             message: "Cache updated successfully.",
             data: data.data,
@@ -655,7 +589,7 @@ app.post("/api/force-update-news", async(req, res) => {
 
 // Add the RSS feed function
 async function fetchEggNewsRSS() {
-    const RSS_FEED_URL = 'https://news.google.com/rss/search?q=egg+prices+US&hl=en-US&gl=US&ceid=US:en';
+    const RSS_FEED_URL = process.env.RSS_FEED_URL;
     const CACHE_FILE = path.join(__dirname, 'rss_cache.json');
     const CACHE_DURATION = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
 
@@ -710,7 +644,7 @@ app.get('/api/news', async(req, res) => {
 
 // Function to fetch daily egg prices
 async function fetchDailyEggPrices() {
-    const DAILY_PRICE_URL = 'https://egg-prices-daily-9e97519ea502.herokuapp.com/scrape';
+    const DAILY_PRICE_URL = process.env.DAILY_PRICE_URL;
 
     try {
         const response = await axios.get(DAILY_PRICE_URL);

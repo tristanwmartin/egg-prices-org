@@ -995,6 +995,82 @@
         });
     </script>
 
+    <script>
+        async function nativeShare() {
+            if (!navigator.share) {
+                alert('Native sharing is not supported on your device/browser');
+                return;
+            }
+
+            try {
+                await navigator.share({
+                    title: 'Current Egg Prices',
+                    text: 'Track nationwide egg prices and trends on EggPrices.org',
+                    url: window.location.href
+                });
+            } catch (error) {
+                console.error('Error sharing:', error);
+            }
+        }
+
+        function shareToTwitter() {
+            const text = encodeURIComponent('Track nationwide egg prices and trends on EggPrices.org');
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://twitter.com/intent/tweet?text=${text}&url=${url}`, '_blank');
+        }
+
+        function shareToFacebook() {
+            const url = encodeURIComponent(window.location.href);
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
+        }
+
+        function shareToLinkedIn() {
+            const url = encodeURIComponent(window.location.href);
+            const title = encodeURIComponent('Current Egg Prices');
+            window.open(`https://www.linkedin.com/sharing/share-offsite/?url=${url}`, '_blank');
+        }
+
+        async function downloadImage() {
+            try {
+                const shareImage = document.getElementById('shareImage');
+                const response = await fetch(shareImage.src);
+                const blob = await response.blob();
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'egg-prices-chart.png';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            } catch (error) {
+                console.error('Error downloading image:', error);
+                alert('Failed to download image. Please try again.');
+            }
+        }
+
+        async function copyLink() {
+            try {
+                await navigator.clipboard.writeText(window.location.href);
+                alert('Link copied to clipboard!');
+            } catch (error) {
+                console.error('Error copying link:', error);
+                alert('Failed to copy link. Please try again.');
+            }
+        }
+
+        async function copyEmbedCode() {
+            try {
+                const embedCode = document.getElementById('embedCode').value;
+                await navigator.clipboard.writeText(embedCode);
+                alert('Embed code copied to clipboard!');
+            } catch (error) {
+                console.error('Error copying embed code:', error);
+                alert('Failed to copy embed code. Please try again.');
+            }
+        }
+    </script>
+
 </body>
 
 </html>
